@@ -1,0 +1,281 @@
+.executive-form-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+
+    ::ng-deep .p-card {
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+
+        .p-card-body {
+            padding: 0;
+        }
+    }
+
+    .card-header {
+        padding: 2rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px 12px 0 0;
+
+        h2 {
+            margin: 0;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: white;
+        }
+    }
+
+    // Profile Preview
+    .profile-preview {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 2rem;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-bottom: 1px solid #e5e7eb;
+
+        .avatar-section {
+            ::ng-deep .p-avatar {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                font-weight: 600;
+                font-size: 1.5rem;
+                width: 80px;
+                height: 80px;
+            }
+        }
+
+        .info-section {
+            h3 {
+                margin: 0 0 0.5rem 0;
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: #1e293b;
+            }
+
+            p {
+                margin: 0 0 0.75rem 0;
+                color: #64748b;
+                font-size: 1rem;
+            }
+
+            .meta-info {
+                display: flex;
+                gap: 0.75rem;
+                flex-wrap: wrap;
+
+                .badge {
+                    padding: 0.5rem 0.75rem;
+                    background: white;
+                    border-radius: 6px;
+                    font-size: 0.875rem;
+                    font-weight: 500;
+                    color: #475569;
+                    border: 1px solid #e2e8f0;
+                }
+            }
+        }
+    }
+
+    // Form Content
+    .form-content {
+        padding: 2rem;
+    }
+
+    .form-section {
+        margin-bottom: 3rem;
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #334155;
+            margin: 0 0 1.5rem 0;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e2e8f0;
+
+            i {
+                color: #667eea;
+                font-size: 1.5rem;
+            }
+        }
+    }
+
+    // Form Grid - 2 columns with proper spacing
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+
+        .form-field {
+            &.full-width {
+                grid-column: 1 / -1;
+            }
+        }
+    }
+
+    // Form Fields
+    .form-field {
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.875rem;
+
+            .required {
+                color: #ef4444;
+                font-weight: 700;
+                margin-left: 2px;
+            }
+        }
+
+        .p-error {
+            display: block;
+            margin-top: 0.5rem;
+            color: #ef4444;
+            font-size: 0.8125rem;
+            font-weight: 500;
+        }
+
+        .p-help {
+            display: block;
+            margin-top: 0.5rem;
+            color: #6366f1;
+            font-size: 0.8125rem;
+            font-weight: 500;
+        }
+    }
+
+    // Debug Section
+    .debug-section {
+        background: #fef3c7;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin: 2rem 0;
+
+        h4 {
+            margin: 0 0 1rem 0;
+            color: #92400e;
+        }
+
+        p {
+            margin: 0.5rem 0;
+            color: #78350f;
+        }
+
+        ul {
+            margin: 0.5rem 0;
+            padding-left: 1.5rem;
+            color: #78350f;
+        }
+    }
+
+    // Form Actions
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        padding: 2rem;
+        border-top: 1px solid #e2e8f0;
+        background: #f8fafc;
+        border-radius: 0 0 12px 12px;
+    }
+
+    // PrimeNG Overrides
+    ::ng-deep {
+        .p-inputtext,
+        .p-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            transition: all 0.2s;
+            font-size: 0.9375rem;
+
+            &:focus {
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+            &.ng-invalid.ng-touched {
+                border-color: #ef4444;
+
+                &:focus {
+                    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+                }
+            }
+        }
+
+        .p-select,
+        .p-multiselect {
+            width: 100%;
+
+            .p-select-label,
+            .p-multiselect-label {
+                padding: 0.75rem;
+                font-size: 0.9375rem;
+            }
+
+            &.p-focus {
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+            &.ng-invalid.ng-touched {
+                border-color: #ef4444;
+            }
+        }
+
+        .p-datepicker {
+            width: 100%;
+
+            .p-inputtext {
+                width: 100%;
+            }
+        }
+
+        .p-button {
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s;
+
+            &:not(:disabled):hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            }
+        }
+    }
+
+    // Responsive
+    @media (max-width: 768px) {
+        padding: 1rem;
+
+        .form-content {
+            padding: 1rem;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .profile-preview {
+            flex-direction: column;
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .form-actions {
+            flex-direction: column-reverse;
+
+            .p-button {
+                width: 100%;
+            }
+        }
+    }
+}

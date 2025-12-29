@@ -1,0 +1,562 @@
+<div class="view-orders-page">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">
+                <i class="pi pi-shopping-cart"></i>
+                Orders Management
+            </h1>
+            <p class="page-subtitle">
+                Monitor orders, revenue and statuses for the last 7 days by
+                default.
+            </p>
+        </div>
+        <div class="page-actions">
+            <p-button
+                icon="pi pi-refresh"
+                label="Refresh"
+                [outlined]="true"
+                size="small"
+                (onClick)="refreshOrders()"
+            ></p-button>
+            <p-button
+                icon="pi pi-download"
+                label="Export"
+                [outlined]="true"
+                size="small"
+                (onClick)="exportOrders()"
+            ></p-button>
+        </div>
+    </div>
+
+    <div class="stats-row" *ngIf="stats() as s">
+        <button
+            class="stat-card"
+            type="button"
+            (click)="onQuickFilter('today')"
+        >
+            <div class="stat-icon-wrapper icon-blue">
+                <i class="pi pi-calendar"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-label">Orders today</div>
+                <div class="stat-value">{{ s.totalOrdersToday ?? 0 }}</div>
+                <div class="stat-hint">Click to view only today</div>
+            </div>
+        </button>
+
+        <button
+            class="stat-card"
+            type="button"
+            (click)="onQuickFilter('pending')"
+        >
+            <div class="stat-icon-wrapper icon-amber">
+                <i class="pi pi-clock"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-label">Pending</div>
+                <div class="stat-value">{{ s.pendingOrders }}</div>
+                <div class="stat-hint">Awaiting confirmation</div>
+            </div>
+        </button>
+
+        <button
+            class="stat-card"
+            type="button"
+            (click)="onQuickFilter('shipped')"
+        >
+            <div class="stat-icon-wrapper icon-sky">
+                <i class="pi pi-send"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-label">Shipped</div>
+                <div class="stat-value">{{ s.shippedOrders }}</div>
+                <div class="stat-hint">On the way</div>
+            </div>
+        </button>
+
+        <button
+            class="stat-card"
+            type="button"
+            (click)="onQuickFilter('delivered')"
+        >
+            <div class="stat-icon-wrapper icon-green">
+                <i class="pi pi-check-circle"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-label">Delivered</div>
+                <div class="stat-value">{{ s.deliveredOrders }}</div>
+                <div class="stat-hint">Completed orders</div>
+            </div>
+        </button>
+
+        <button
+            class="stat-card"
+            type="button"
+            (click)="onQuickFilter('revenue7')"
+        >
+            <div class="stat-icon-wrapper icon-teal">
+                <i class="pi pi-dollar"></i>
+            </div>
+            <div class="stat-content">
+                <div class="stat-label">Revenue (7 days)</div>
+                <div class="stat-value">
+                    ₹{{ s.weeklyRevenue ?? s.totalRevenue | number: '1.0-0' }}
+                </div>
+                <div class="stat-hint">Last 7 days</div>
+            </div>
+        </button>
+    </div>
+
+    <div class="filter-bar">
+        <div class="filter-search">
+            <span class="p-input-icon-left">
+                <i class="pi pi-search"></i>
+                <input
+                    pInputText
+                    type="text"
+                    placeholder="Search by order ID, customer, email or executive"
+                    class="search-input"
+                    [(ngModel)]="searchQuery"
+                    (input)="onSearch()"
+                />
+            </span>
+        </div>
+
+        <div class="filter-controls">
+            <p-select
+                [options]="statusOptions"
+                [(ngModel)]="selectedStatus"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="All"
+                [showClear]="false"
+                styleClass="filter-select"
+                (onChange)="onStatusFilter()"
+            ></p-select>
+
+            <p-select
+                [options]="dateRangeOptions"
+                [(ngModel)]="selectedDateRange"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="All time"
+                [showClear]="false"
+                styleClass="filter-select"
+                (onChange)="onDateRangeChange()"
+            ></p-select>
+
+            <p-select
+                [options]="executiveFilterOptions"
+                [(ngModel)]="selectedExecutiveId"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="All executives"
+                [showClear]="false"
+                styleClass="filter-select"
+                (onChange)="onExecutiveFilterChange()"
+            ></p-select>
+
+            <button
+                type="button"
+                class="clear-btn"
+                pButton
+                label="Clear"
+                [text]="true"
+                size="small"
+                (click)="onClearFilters()"
+            ></button>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <p-table
+            #dt
+            [value]="filteredOrders"
+            [loading]="loading()"
+            [paginator]="true"
+            [rows]="10"
+            [rowsPerPageOptions]="[10, 25, 50]"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} orders"
+            dataKey="_id"
+            [rowHover]="true"
+            styleClass="p-datatable-sm"
+            [tableStyle]="{ 'min-width': '60rem' }"
+        >
+            <ng-template pTemplate="header">
+                <tr>
+                    <th class="col-id">Order ID</th>
+                    <th class="col-person">Customer / Executive</th>
+                    <th class="col-status">Status</th>
+                    <th class="col-payment">Payment</th>
+                    <th class="col-total">Total</th>
+                    <th class="col-date">Date</th>
+                    <th class="col-actions" style="padding-left: 2rem;">Actions</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-order>
+                <tr>
+                    <td class="col-id">
+                        <span class="order-id-badge">
+                            {{
+                                order.orderNumber ?? (order._id | slice: 0 : 8)
+                            }}
+                        </span>
+                    </td>
+
+                    <td class="col-person">
+                        <div class="person-cell">
+                            <span class="person-name">{{
+                                getExecutiveName(order)
+                            }}</span>
+                            <span class="person-meta">
+                                {{ order.customerEmail || 'N/A' }}
+                            </span>
+                        </div>
+                    </td>
+
+                    <td class="col-status">
+                        <p-tag
+                            [value]="order.status"
+                            [severity]="getStatusSeverity(order.status)"
+                        ></p-tag>
+                    </td>
+
+                    <td class="col-payment">
+                        <p-tag
+                            [value]="order.paymentStatus || 'N/A'"
+                            [severity]="
+                                order.paymentStatus === 'paid'
+                                    ? 'success'
+                                    : order.paymentStatus === 'failed'
+                                      ? 'danger'
+                                      : 'warn'
+                            "
+                        ></p-tag>
+                    </td>
+
+                    <td class="col-total">
+                        <span class="total-value">
+                            {{ formatCurrency(order.totalAmount) }}
+                        </span>
+                    </td>
+
+                    <td class="col-date">
+                        {{ order.createdAt | date: 'dd MMM, yyyy' }}
+                    </td>
+
+                    <td class="col-actions">
+                        <div class="action-buttons" >
+                            <p-button
+                                icon="pi pi-eye"
+                                [rounded]="true"
+                                [text]="true"
+                                severity="info"
+                                size="small"
+                                pTooltip="View details"
+                                tooltipPosition="top"
+                                (onClick)="viewOrderDetails(order)"
+                            ></p-button>
+                            <p-button
+                                icon="pi pi-print"
+                                [rounded]="true"
+                                [text]="true"
+                                severity="secondary"
+                                size="small"
+                                pTooltip="Print invoice"
+                                tooltipPosition="top"
+                                (onClick)="downloadInvoice(order)"
+                            ></p-button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <i class="pi pi-inbox"></i>
+                            <p>
+                                No orders match the current filters. Adjust the
+                                date, status or search text to see more results.
+                            </p>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+
+    <p-dialog
+        [(visible)]="orderDetailsVisible"
+        [modal]="true"
+        [closable]="true"
+        [style]="{ width: '90vw', maxWidth: '900px' }"
+        [contentStyle]="{ padding: 0 }"
+        [header]="'Order ' + (selectedOrder?._id | slice: 0 : 8 | uppercase)"
+        *ngIf="selectedOrder"
+    >
+        <div class="order-details-wrapper">
+            <div class="details-header">
+                <div class="info-card">
+                    <div class="card-icon" style="background-color: #dbeafe">
+                        <i
+                            class="pi pi-shopping-bag"
+                            style="color: #3b82f6"
+                        ></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-label">Order ID</div>
+                        <div class="card-value">
+                            {{ selectedOrder._id | slice: 0 : 8 | uppercase }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="card-icon" style="background-color: #fef3c7">
+                        <i class="pi pi-calendar" style="color: #f59e0b"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-label">Order Date</div>
+                        <div class="card-value">
+                            {{ selectedOrder.createdAt | date: 'MMM dd, yyyy' }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card">
+                    <div class="card-icon" style="background-color: #d1fae5">
+                        <i class="pi pi-dollar" style="color: #10b981"></i>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-label">Total Amount</div>
+                        <div class="card-value">
+                            {{ formatCurrency(selectedOrder.totalAmount) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="details-content">
+                <div class="details-grid">
+                    <div class="grid-col">
+                        <div class="section-card">
+                            <h4 class="section-title">
+                                <i class="pi pi-user"></i>
+                                Customer Information
+                            </h4>
+                            <div class="info-row">
+                                <span class="info-label">Name:</span>
+                                <span class="info-value">
+                                    {{ selectedOrder.customerName || 'N/A' }}
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Email:</span>
+                                <span class="info-value">
+                                    {{ selectedOrder.customerEmail || 'N/A' }}
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Phone:</span>
+                                <span class="info-value">
+                                    {{ selectedOrder.customerPhone || 'N/A' }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-col">
+                        <div class="section-card">
+                            <h4 class="section-title">
+                                <i class="pi pi-briefcase"></i>
+                                Executive & Status
+                            </h4>
+                            <div class="info-row">
+                                <span class="info-label">Executive:</span>
+                                <span class="info-value">
+                                    {{ getExecutiveName(selectedOrder) }}
+                                </span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Order Status:</span>
+                                <p-tag
+                                    [value]="selectedOrder.status"
+                                    [severity]="
+                                        getStatusSeverity(selectedOrder.status)
+                                    "
+                                ></p-tag>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Payment:</span>
+                                <p-tag
+                                    [value]="selectedOrder.paymentStatus"
+                                    [severity]="
+                                        selectedOrder.paymentStatus === 'paid'
+                                            ? 'success'
+                                            : 'warn'
+                                    "
+                                ></p-tag>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <h4 class="section-title">
+                        <i class="pi pi-map-marker"></i>
+                        Shipping Address
+                    </h4>
+                    <div class="address-block">
+                        <p class="address-name">
+                            <strong>{{
+                                selectedOrder.shipToName || 'N/A'
+                            }}</strong>
+                        </p>
+                        <p class="address-line">
+                            {{ selectedOrder.shipToPhone || 'N/A' }}
+                        </p>
+                        <p class="address-line">
+                            {{ selectedOrder.shipToAddress || 'N/A' }}
+                        </p>
+                        <p class="address-line">
+                            {{ selectedOrder.shipToCity || '' }}
+                            {{
+                                selectedOrder.shipToState
+                                    ? ', ' + selectedOrder.shipToState
+                                    : ''
+                            }}
+                            {{
+                                selectedOrder.shipToPincode
+                                    ? '- ' + selectedOrder.shipToPincode
+                                    : ''
+                            }}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="section-card">
+                    <h4 class="section-title">
+                        <i class="pi pi-box"></i>
+                        Order Items
+                    </h4>
+                    <div class="table-scroll">
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th>Product</th>
+                                    <th class="center-cell">Quantity</th>
+                                    <th class="right-cell">Unit Price</th>
+                                    <th class="right-cell">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of orderItems()">
+                                    <td>
+                                        <div class="product-info">
+                                            <span class="product-name">
+                                                {{ item.productName }}
+                                            </span>
+                                            <span class="product-sku">
+                                                SKU: {{ item.productSku }}
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="center-cell">
+                                        {{ item.quantity }}
+                                    </td>
+                                    <td class="right-cell">
+                                        {{ formatCurrency(item.unitPrice) }}
+                                    </td>
+                                    <td class="right-cell amount-bold">
+                                        {{ formatCurrency(item.totalPrice) }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr class="summary-row">
+                                    <td colspan="3" class="summary-label">
+                                        Subtotal:
+                                    </td>
+                                    <td class="summary-value">
+                                        {{
+                                            formatCurrency(
+                                                selectedOrder.subtotal
+                                            )
+                                        }}
+                                    </td>
+                                </tr>
+                                <tr class="summary-row">
+                                    <td colspan="3" class="summary-label">
+                                        Discount:
+                                    </td>
+                                    <td class="summary-value discount">
+                                        -{{
+                                            formatCurrency(
+                                                selectedOrder.discount
+                                            )
+                                        }}
+                                    </td>
+                                </tr>
+                                <tr class="summary-row">
+                                    <td colspan="3" class="summary-label">
+                                        Tax:
+                                    </td>
+                                    <td class="summary-value">
+                                        {{ formatCurrency(selectedOrder.tax) }}
+                                    </td>
+                                </tr>
+                                <tr class="summary-row">
+                                    <td colspan="3" class="summary-label">
+                                        Shipping:
+                                    </td>
+                                    <td class="summary-value">
+                                        {{
+                                            formatCurrency(
+                                                selectedOrder.shippingCost
+                                            )
+                                        }}
+                                    </td>
+                                </tr>
+                                <tr class="total-row">
+                                    <td colspan="3" class="summary-label">
+                                        <strong>Final Amount:</strong>
+                                    </td>
+                                    <td class="summary-value">
+                                        <strong>
+                                            {{
+                                                formatCurrency(
+                                                    selectedOrder.totalAmount
+                                                )
+                                            }}
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <ng-template pTemplate="footer">
+            <div class="dialog-actions">
+                <p-button
+                    label="Close"
+                    icon="pi pi-times"
+                    severity="secondary"
+                    (onClick)="orderDetailsVisible = false"
+                ></p-button>
+                <p-button
+                    label="Print Invoice"
+                    icon="pi pi-print"
+                    severity="success"
+                    (onClick)="printOrder(selectedOrder!)"
+                ></p-button>
+            </div>
+        </ng-template>
+    </p-dialog>
+</div>

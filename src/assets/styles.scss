@@ -1,0 +1,66 @@
+/* You can add global styles to this file, and also import other style files */
+@use './tailwind.css';
+
+// PrimeNG Icons
+@use 'primeicons/primeicons.css';
+
+// Apollo Layout Styles (CRITICAL - this loads all sidebar/layout CSS)
+@use './layout/layout.scss';
+
+// Demo styles (optional)
+
+
+
+.layout-container.layout-drawer {
+    .layout-sidebar {
+        transform: translateX(-100%) !important;
+        transition: transform 0.3s cubic-bezier(0, 0, 0.2, 1) !important;
+        z-index: 999 !important;
+        width: 18rem !important;
+    }
+
+    // Show when menu is active
+    &.layout-mobile-active .layout-sidebar,
+    &.layout-overlay-active .layout-sidebar,
+    &.layout-sidebar-active .layout-sidebar {
+        transform: translateX(0) !important;
+    }
+
+    // Keep content at left edge (no margin)
+    .layout-content-wrapper {
+        margin-left: 0 !important;
+    }
+
+    // Topbar on top
+    .layout-topbar {
+        z-index: 1001 !important;
+        left: 0 !important; // ✅ Don't shift with sidebar
+    }
+
+    // Show mask when sidebar is open
+    .layout-mask {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.4);
+        z-index: 998;
+    }
+
+    &.layout-mobile-active .layout-mask,
+    &.layout-overlay-active .layout-mask,
+    &.layout-sidebar-active .layout-mask {
+        display: block !important;
+    }
+}
+
+// PrimeNG Drawer stays above
+.p-drawer {
+    z-index: 1100 !important;
+}
+
+.p-drawer-mask {
+    z-index: 1099 !important;
+}

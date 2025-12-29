@@ -1,0 +1,303 @@
+<div class="admin-list-container">
+  <!-- Header Section -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">
+          <i class="pi pi-users"></i>
+          Admin Management
+        </h1>
+        <p class="page-subtitle">
+          Manage and monitor {{ totalRecords() }} administrators across your organization
+        </p>
+      </div>
+      <button
+        pButton
+        type="button"
+        label="Add New Admin"
+        icon="pi pi-user-plus"
+        class="create-btn"
+        (click)="navigateToCreateAdmin()"
+      ></button>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-card">
+    <div class="filters-header">
+      <h3 class="filters-title">
+        <i class="pi pi-filter"></i>
+        Filters
+      </h3>
+      <button
+        pButton
+        type="button"
+        label="Clear All"
+        icon="pi pi-times"
+        class="p-button-text p-button-sm clear-btn"
+        (click)="clearFilters()"
+        [disabled]="!searchQuery() && selectedRoleLevel() === null && selectedStatus() === null"
+      ></button>
+    </div>
+
+    <div class="filters-grid">
+      <!-- Search by Name -->
+      <div class="filter-item">
+        <label class="filter-label">Search by Name</label>
+        <p-iconfield iconPosition="left">
+          <p-inputicon styleClass="pi pi-search" />
+          <input
+            pInputText
+            type="text"
+            placeholder="Search by admin name..."
+            class="search-input"
+            [value]="searchQuery()"
+            (input)="onSearch($event)"
+          />
+        </p-iconfield>
+      </div>
+
+      <!-- Role Level Filter -->
+      <div class="filter-item">
+        <label class="filter-label">Role Level</label>
+        <p-select
+          [options]="roleOptions"
+          [(ngModel)]="selectedRoleLevel"
+          (onChange)="onRoleFilter($event.value)"
+          placeholder="All Roles"
+          [showClear]="true"
+          optionLabel="label"
+          optionValue="value"
+          class="filter-dropdown"
+        />
+      </div>
+
+      <!-- Status Filter -->
+      <div class="filter-item">
+        <label class="filter-label">Status</label>
+        <p-select
+          [options]="statusOptions"
+          [(ngModel)]="selectedStatus"
+          (onChange)="onStatusFilter($event.value)"
+          placeholder="All Status"
+          optionLabel="label"
+          optionValue="value"
+          class="filter-dropdown"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading() && admins().length === 0" class="loading-state">
+    <div class="loading-card">
+      <i class="pi pi-spin pi-spinner loading-icon"></i>
+      <p class="loading-text">Loading administrators...</p>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage() && !isLoading()" class="error-state">
+    <div class="error-card">
+      <i class="pi pi-exclamation-circle error-icon"></i>
+      <h3 class="error-title">Failed to Load Data</h3>
+      <p class="error-message">{{ errorMessage() }}</p>
+      <button
+        pButton
+        type="button"
+        label="Retry"
+        icon="pi pi-refresh"
+        class="p-button-outlined"
+        (click)="loadAdmins()"
+      ></button>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div *ngIf="!isLoading() || admins().length > 0" class="table-card">
+    <p-table
+      [value]="displayedAdmins()"
+      [paginator]="true"
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} admins"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      [globalFilterFields]="['name', 'email', 'roleName']"
+      styleClass="p-datatable-gridlines p-datatable-striped"
+      responsiveLayout="scroll"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="name">
+            Name
+            <p-sortIcon field="name" />
+          </th>
+          <th pSortableColumn="email">
+            Email
+            <p-sortIcon field="email" />
+          </th>
+          <th>Phone</th>
+          <th pSortableColumn="roleLevel">
+            Role
+            <p-sortIcon field="roleLevel" />
+          </th>
+          <th pSortableColumn="hierarchyPath">
+            Hierarchy
+            <p-sortIcon field="hierarchyPath" />
+          </th>
+          <th pSortableColumn="isActive">
+            Status
+            <p-sortIcon field="isActive" />
+          </th>
+          <th pSortableColumn="lastLogin">
+            Last Login
+            <p-sortIcon field="lastLogin" />
+          </th>
+          <th class="actions-column">Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-admin>
+        <tr>
+          <!-- Name -->
+          <td>
+            <div class="admin-name-cell">
+              <i class="pi pi-user user-icon"></i>
+              <span class="admin-name">{{ admin.name }}</span>
+            </div>
+          </td>
+
+          <!-- Email -->
+          <td>
+            <a [href]="'mailto:' + admin.email" class="email-link">
+              {{ admin.email }}
+            </a>
+          </td>
+
+          <!-- Phone -->
+          <td>
+            <span *ngIf="admin.phone" class="phone-number">
+              {{ admin.phone }}
+            </span>
+            <span *ngIf="!admin.phone" class="text-muted">-</span>
+          </td>
+
+          <!-- Role -->
+          <td>
+            <span
+              class="role-badge"
+              [ngClass]="getRoleBadgeClass(admin.roleLevel)"
+              [pTooltip]="'Level ' + admin.roleLevel"
+            >
+              {{ admin.roleName }}
+            </span>
+          </td>
+
+          <!-- Hierarchy -->
+          <td>
+            <div class="hierarchy-cell">
+              <i class="pi pi-sitemap hierarchy-icon"></i>
+              <span class="hierarchy-path">{{ admin.hierarchyPath }}</span>
+            </div>
+          </td>
+
+          <!-- Status -->
+          <td>
+            <p-tag
+              [value]="admin.isActive ? 'Active' : 'Inactive'"
+              [severity]="getStatusSeverity(admin.isActive)"
+            />
+          </td>
+
+          <!-- Last Login -->
+          <td>
+            <span class="last-login">{{ formatLastLogin(admin.lastLogin) }}</span>
+          </td>
+
+          <!-- Actions -->
+          <td class="actions-cell">
+            <div class="action-buttons">
+              <button
+                pButton
+                type="button"
+                icon="pi pi-eye"
+                class="p-button-rounded p-button-text p-button-sm action-btn view-btn"
+                pTooltip="View Details"
+                tooltipPosition="top"
+                (click)="viewAdmin(admin)"
+              ></button>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-pencil"
+                class="p-button-rounded p-button-text p-button-sm action-btn edit-btn"
+                pTooltip="Edit Admin"
+                tooltipPosition="top"
+                (click)="editAdmin(admin)"
+              ></button>
+              <button
+                pButton
+                type="button"
+                icon="pi pi-trash"
+                class="p-button-rounded p-button-text p-button-sm action-btn delete-btn"
+                pTooltip="Delete Admin"
+                tooltipPosition="top"
+                (click)="deleteAdmin(admin)"
+              ></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8">
+            <div class="empty-state">
+              <i class="pi pi-users empty-icon"></i>
+              <h3 class="empty-title">No Administrators Found</h3>
+              <p class="empty-message">
+                <span *ngIf="searchQuery() || selectedRoleLevel() !== null || selectedStatus() !== null">
+                  No results match your filters. Try adjusting your search criteria.
+                </span>
+                <span *ngIf="!searchQuery() && selectedRoleLevel() === null && selectedStatus() === null">
+                  Get started by creating your first administrator.
+                </span>
+              </p>
+              <button
+                *ngIf="!searchQuery() && selectedRoleLevel() === null && selectedStatus() === null"
+                pButton
+                type="button"
+                label="Create Admin"
+                icon="pi pi-plus"
+                class="p-button-outlined"
+                (click)="navigateToCreateAdmin()"
+              ></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+<app-view-user-drawer 
+  [userId]="selectedAdminId()"
+  [userType]="selectedUserType()"
+  [visible]="drawerVisible()"
+  (onClose)="closeDrawer()"
+></app-view-user-drawer>
+
+    <!-- Load More Button -->
+    <div *ngIf="hasMore() && displayedAdmins().length > 0" class="load-more-section">
+      <button
+        pButton
+        type="button"
+        label="Load More"
+        icon="pi pi-angle-down"
+        class="p-button-outlined load-more-btn"
+        [loading]="isLoading()"
+        (click)="loadMore()"
+      ></button>
+    </div>
+  </div>
+
+  <!-- Toast Messages -->
+  <p-toast />
+</div>

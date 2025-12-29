@@ -1,0 +1,559 @@
+<div class="progress-root">
+  <p-toast />
+
+  <!-- Header -->
+  <div class="progress-header">
+    <div class="header-content">
+      <div>
+        <h2>
+          <i class="pi pi-chart-line"></i>
+          Training Progress
+        </h2>
+        <p>Track employee training completion and performance</p>
+      </div>
+
+      <div class="header-actions">
+        <p-button
+          icon="pi pi-refresh"
+          label="Refresh"
+          [outlined]="true"
+          (click)="refresh()"
+          [loading]="loading()"
+        />
+        <p-button
+          icon="pi pi-download"
+          label="Export"
+          severity="success"
+          [outlined]="true"
+          (click)="exportProgress()"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="stats-grid">
+    <!-- Total Enrollments -->
+    <div class="stat-card">
+      <div class="stat-content">
+        <div class="stat-icon">
+          <i class="pi pi-users"></i>
+        </div>
+        <div class="stat-details">
+          <span class="stat-label">Total Enrollments</span>
+          <div class="stat-value">
+            <span class="stat-number">{{ totalRecords() }}</span>
+            <p-tag value="Active" severity="info" [rounded]="true" class="stat-badge" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Completed -->
+    <div class="stat-card completed-card">
+      <div class="stat-content">
+        <div class="stat-icon">
+          <i class="pi pi-check-circle"></i>
+        </div>
+        <div class="stat-details">
+          <span class="stat-label">Completed</span>
+          <div class="stat-value">
+            <span class="stat-number">{{ completedCount() }}</span>
+            <span class="stat-percentage text-green-600">
+              {{ totalRecords() > 0 ? (completedCount() / totalRecords() * 100).toFixed(0) : 0 }}%
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- In Progress -->
+    <div class="stat-card in-progress-card">
+      <div class="stat-content">
+        <div class="stat-icon">
+          <i class="pi pi-spin pi-spinner"></i>
+        </div>
+        <div class="stat-details">
+          <span class="stat-label">In Progress</span>
+          <div class="stat-value">
+            <span class="stat-number">{{ inProgressCount() }}</span>
+            <span class="stat-percentage text-orange-600">
+              {{ totalRecords() > 0 ? (inProgressCount() / totalRecords() * 100).toFixed(0) : 0 }}%
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Failed -->
+    <div class="stat-card failed-card">
+      <div class="stat-content">
+        <div class="stat-icon">
+          <i class="pi pi-times-circle"></i>
+        </div>
+        <div class="stat-details">
+          <span class="stat-label">Failed</span>
+          <div class="stat-value">
+            <span class="stat-number">{{ failedCount() }}</span>
+            @if (failedCount() > 0) {
+              <p-tag value="Review" [rounded]="true" severity="danger" class="stat-badge" />
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Secondary stats -->
+  <div class="stats-grid stats-secondary">
+    <div class="stat-secondary-card">
+      <div class="stat-secondary-header">
+        <h3>
+          <i class="pi pi-chart-bar"></i>
+          Average Completion Rate
+        </h3>
+        <span class="stat-secondary-value">{{ averageCompletion() }}%</span>
+      </div>
+      <p-progressBar [value]="averageCompletion()" [showValue]="false" />
+    </div>
+
+    <div class="stat-secondary-card">
+      <div class="stat-secondary-header">
+        <h3>
+          <i class="pi pi-verified"></i>
+          Success Rate
+        </h3>
+        <span class="stat-secondary-value success">{{ successRate() }}%</span>
+      </div>
+      <p-progressBar
+        [value]="successRate()"
+        [showValue]="false"
+        
+      />
+    </div>
+  </div>
+
+  <!-- Chart card -->
+  <div class="chart-card">
+    <div class="chart-header">
+      <div>
+        <h3>
+          <i class="pi pi-chart-pie"></i>
+          Progress Distribution
+        </h3>
+        <p>Overview of training completion status</p>
+      </div>
+    </div>
+    <div class="chart-container">
+      <p-chart type="pie" [data]="chartData" [options]="chartOptions" />
+    </div>
+  </div>
+
+  <!-- Table card -->
+  <div class="table-card">
+    <div class="table-header">
+      <div class="table-header-main">
+        <h3>
+          <i class="pi pi-list"></i>
+          Training Progress List
+        </h3>
+      </div>
+      <div class="table-filters">
+        <span class="p-input-icon-left search-input">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            (input)="onGlobalFilter($event)"
+            placeholder="Search..."
+          />
+        </span>
+        <p-select
+          [options]="statusOptions"
+          [(ngModel)]="selectedStatus"
+          (onChange)="onStatusChange()"
+          placeholder="Filter by Status"
+          optionLabel="label"
+          optionValue="value"
+          [showClear]="true"
+          styleClass="status-select"
+        />
+      </div>
+    </div>
+
+    <p-table
+      #dt
+      [value]="progressList()"
+      [rows]="50"
+      [paginator]="true"
+      [globalFilterFields]="['executiveName', 'courseTitle']"
+      [tableStyle]="{ 'min-width': '75rem' }"
+      [loading]="loading()"
+      styleClass="p-datatable-striped progress-table"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} records"
+      [showCurrentPageReport]="true"
+      [rowsPerPageOptions]="[10, 25, 50, 100]"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="executiveName">
+            Executive
+            <p-sortIcon field="executiveName" />
+          </th>
+          <th pSortableColumn="courseTitle">
+            Course
+            <p-sortIcon field="courseTitle" />
+          </th>
+          <th pSortableColumn="status">
+            Status
+            <p-sortIcon field="status" />
+          </th>
+          <th pSortableColumn="progressPercentage">
+            Progress
+            <p-sortIcon field="progressPercentage" />
+          </th>
+          <th pSortableColumn="completedModules">
+            Modules
+            <p-sortIcon field="completedModules" />
+          </th>
+          <th *ngIf="selectedStatus === 'completed'">Score</th>
+          <th class="actions-column">Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-progress>
+        <tr>
+          <td>
+            <div class="cell-executive">
+              <div class="avatar">
+                <i class="pi pi-user"></i>
+              </div>
+              <span class="name">{{ progress.executiveName || 'N/A' }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="cell-course">
+              <i class="pi pi-book"></i>
+              <span>{{ progress.courseTitle || 'N/A' }}</span>
+            </div>
+          </td>
+          <td>
+            <p-tag
+              [value]="progress.status | titlecase"
+              [severity]="getStatusSeverity(progress.status)"
+            />
+          </td>
+          <td>
+            <div class="cell-progress">
+              <p-progressBar
+                [value]="progress.progressPercentage"
+                [showValue]="false"
+              ></p-progressBar>
+              <span class="percent">{{ progress.progressPercentage }}%</span>
+            </div>
+          </td>
+          <td>
+            <span class="cell-modules">
+              {{ progress.completedModules }} / {{ progress.totalModules }}
+            </span>
+          </td>
+          <td *ngIf="selectedStatus === 'completed'">
+            @if (progress.finalScore) {
+              <div class="cell-score">
+                <i class="pi pi-star-fill"></i>
+                <span>{{ progress.finalScore }}%</span>
+              </div>
+            } @else {
+              <span class="text-500">N/A</span>
+            }
+          </td>
+          <td>
+            <div class="cell-actions">
+              <p-button
+                icon="pi pi-eye"
+                severity="info"
+                [rounded]="true"
+                [text]="true"
+                (onClick)="viewDetails(progress)"
+                pTooltip="View Details"
+                tooltipPosition="top"
+              />
+              <p-button
+                *ngIf="progress.status === 'completed' && !progress.certificateId"
+                icon="pi pi-file"
+                severity="success"
+                [rounded]="true"
+                [text]="true"
+                [loading]="loading()"
+                (onClick)="generateCertificate(progress)"
+                pTooltip="Generate Certificate"
+                tooltipPosition="top"
+              />
+              <p-button
+                *ngIf="progress.status === 'completed' && progress.certificateId"
+                icon="pi pi-download"
+                severity="success"
+                [rounded]="true"
+                [text]="true"
+                (onClick)="downloadCertificate(progress)"
+                pTooltip="Download Certificate"
+                tooltipPosition="top"
+              />
+              <p-button
+                *ngIf="progress.status !== 'completed'"
+                icon="pi pi-send"
+                [rounded]="true"
+                [text]="true"
+                (onClick)="sendReminder(progress)"
+                pTooltip="Send Reminder"
+                tooltipPosition="top"
+              />
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Empty -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td [attr.colspan]="selectedStatus === 'completed' ? 7 : 6">
+            <div class="empty-state">
+              <div class="empty-icon">
+                <i class="pi pi-inbox"></i>
+              </div>
+              <h3>No Training Progress Found</h3>
+              <p>
+                @if (selectedStatus) {
+                  No progress records with status "{{ selectedStatus | titlecase }}" found.
+                } @else {
+                  Training progress will appear here once executives enroll in courses.
+                }
+              </p>
+              @if (selectedStatus) {
+                <p-button
+                  label="Clear Filters"
+                  icon="pi pi-filter-slash"
+                  [outlined]="true"
+                  (click)="clearFilters()"
+                />
+              }
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Loading -->
+      <ng-template pTemplate="loadingbody">
+        <tr>
+          <td [attr.colspan]="selectedStatus === 'completed' ? 7 : 6">
+            <div class="loading-state">
+              <i class="pi pi-spin pi-spinner"></i>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- Details Dialog -->
+<p-dialog
+  [(visible)]="detailsDialogVisible"
+  [style]="{ width: '800px', maxHeight: '90vh' }"
+  header="Training Progress Details"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="closeDialog()"
+>
+  <ng-container *ngIf="selectedProgress">
+    <div class="flex flex-column gap-4">
+      <!-- Course Info Section -->
+      <div class="surface-50 border-round p-3">
+        <h5 class="mt-0 mb-3 text-primary">
+          <i class="pi pi-book mr-2"></i>Course Information
+        </h5>
+        <div class="grid">
+          <div class="col-12">
+            <label class="font-semibold text-color-secondary text-sm">Course Title</label>
+            <p class="m-0 mt-1 text-lg font-medium">{{ selectedProgress.courseTitle || 'N/A' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Executive Info Section -->
+      <div class="surface-50 border-round p-3">
+        <h5 class="mt-0 mb-3 text-primary">
+          <i class="pi pi-user mr-2"></i>Executive Information
+        </h5>
+        <div class="grid">
+          <div class="col-12">
+            <label class="font-semibold text-color-secondary text-sm">Name</label>
+            <p class="m-0 mt-1 font-medium">{{ selectedProgress.executiveName || 'N/A' }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Section -->
+      <div class="surface-50 border-round p-3">
+        <h5 class="mt-0 mb-3 text-primary">
+          <i class="pi pi-chart-line mr-2"></i>Progress Details
+        </h5>
+        <div class="grid">
+          <div class="col-12 md:col-6">
+            <label class="font-semibold text-color-secondary text-sm">Status</label>
+            <div class="mt-2">
+              <p-tag
+                [value]="selectedProgress.status | titlecase"
+                [severity]="getStatusSeverity(selectedProgress.status)"
+                styleClass="text-base"
+              />
+            </div>
+          </div>
+          <div class="col-12 md:col-6">
+            <label class="font-semibold text-color-secondary text-sm">Overall Progress</label>
+            <p class="m-0 mt-1 text-2xl font-bold text-primary">{{ selectedProgress.progressPercentage }}%</p>
+          </div>
+          <div class="col-12">
+            <label class="font-semibold text-color-secondary text-sm mb-2 block">Progress Bar</label>
+            <p-progressBar [value]="selectedProgress.progressPercentage" [style]="{ height: '1.5rem' }" />
+          </div>
+          <div class="col-12 md:col-6">
+            <label class="font-semibold text-color-secondary text-sm">Modules Completed</label>
+            <p class="m-0 mt-1 text-lg">
+              <span class="font-bold text-primary">{{ selectedProgress.completedModules }}</span>
+              <span class="text-500"> / {{ selectedProgress.totalModules }}</span>
+            </p>
+          </div>
+          <div class="col-12 md:col-6" *ngIf="selectedProgress.finalScore">
+            <label class="font-semibold text-color-secondary text-sm">Final Score</label>
+            <div class="flex align-items-center gap-2 mt-1">
+              <i class="pi pi-star-fill text-yellow-500 text-xl"></i>
+              <p class="m-0 text-xl font-bold text-green-600">{{ selectedProgress.finalScore }}%</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline Section -->
+      <div class="surface-50 border-round p-3">
+        <h5 class="mt-0 mb-3 text-primary">
+          <i class="pi pi-clock mr-2"></i>Timeline
+        </h5>
+        <div class="grid">
+          <div class="col-12 md:col-6">
+            <label class="font-semibold text-color-secondary text-sm">Started Date</label>
+            <p class="m-0 mt-1 font-medium">{{ selectedProgress.createdAt | date: 'MMMM dd, yyyy' }}</p>
+            <p class="text-sm text-500 m-0">{{ selectedProgress.createdAt | date: 'HH:mm' }}</p>
+          </div>
+          <div class="col-12 md:col-6" *ngIf="selectedProgress.completedAt">
+            <label class="font-semibold text-color-secondary text-sm">Completed Date</label>
+            <p class="m-0 mt-1 font-medium">{{ selectedProgress.completedAt | date: 'MMMM dd, yyyy' }}</p>
+            <p class="text-sm text-500 m-0">{{ selectedProgress.completedAt | date: 'HH:mm' }}</p>
+          </div>
+          <div class="col-12" *ngIf="selectedProgress.completedAt">
+            <label class="font-semibold text-color-secondary text-sm">Time Spent</label>
+            <p class="m-0 mt-1 font-medium">
+              <i class="pi pi-stopwatch mr-2 text-primary"></i>
+              {{ calculateTimeSpent(selectedProgress) }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Certificate Section -->
+      <div class="surface-50 border-round p-3" *ngIf="selectedProgress.status === 'completed'">
+        <h5 class="mt-0 mb-3 text-primary">
+          <i class="pi pi-certificate mr-2"></i>Certificate
+        </h5>
+        
+        <!-- Certificate Available -->
+        <div *ngIf="selectedProgress.certificateId" class="flex align-items-center gap-3 p-3 border-round bg-green-50">
+          <div class="flex align-items-center justify-content-center bg-green-100 border-round" style="width: 4rem; height: 4rem">
+            <i class="pi pi-file-pdf text-green-600 text-3xl"></i>
+          </div>
+          <div class="flex-1">
+            <p class="m-0 font-bold text-lg text-900">Certificate Available</p>
+            <p class="text-sm text-600 m-0 mt-1">Click to download your completion certificate</p>
+          </div>
+          <p-button
+            label="Download"
+            icon="pi pi-download"
+            severity="success"
+            (onClick)="downloadCertificate(selectedProgress)"
+          />
+        </div>
+
+        <!-- Certificate Not Generated -->
+        <div *ngIf="!selectedProgress.certificateId" class="flex align-items-center gap-3 p-3 border-round bg-orange-50">
+          <div class="flex align-items-center justify-content-center bg-orange-100 border-round" style="width: 4rem; height: 4rem">
+            <i class="pi pi-file text-orange-600 text-3xl"></i>
+          </div>
+          <div class="flex-1">
+            <p class="m-0 font-bold text-lg text-900">Certificate Not Generated</p>
+            <p class="text-sm text-600 m-0 mt-1">Generate your completion certificate now</p>
+          </div>
+          <p-button
+            label="Generate"
+            icon="pi pi-file"
+            severity="success"
+            [loading]="loading()"
+            (onClick)="generateCertificate(selectedProgress)"
+          />
+        </div>
+      </div>
+
+      <!-- Reminder Section (for incomplete training) -->
+      <div class="surface-50 border-round p-3" *ngIf="selectedProgress.status !== 'completed'">
+        <h5 class="mt-0 mb-3 text-primary">
+          <i class="pi pi-bell mr-2"></i>Actions
+        </h5>
+        <div class="flex align-items-center gap-3 p-3 border-round bg-blue-50">
+          <div class="flex align-items-center justify-content-center bg-blue-100 border-round" style="width: 4rem; height: 4rem">
+            <i class="pi pi-send text-blue-600 text-2xl"></i>
+          </div>
+          <div class="flex-1">
+            <p class="m-0 font-bold text-lg text-900">Send Reminder</p>
+            <p class="text-sm text-600 m-0 mt-1">Send a notification to complete the training</p>
+          </div>
+          <p-button
+            label="Send"
+            icon="pi pi-send"
+            severity="info"
+            (onClick)="sendReminder(selectedProgress)"
+          />
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-between w-full">
+      <p-button
+        label="Close"
+        icon="pi pi-times"
+        [text]="true"
+        (onClick)="closeDialog()"
+      />
+      <div class="flex gap-2">
+        @if (selectedProgress?.status === 'completed' && selectedProgress?.certificateId) {
+          <p-button
+            label="Download Certificate"
+            icon="pi pi-download"
+            severity="success"
+            (onClick)="downloadCertificate(selectedProgress!)"
+          />
+        }
+        @if (selectedProgress?.status === 'completed' && !selectedProgress?.certificateId) {
+          <p-button
+            label="Generate Certificate"
+            icon="pi pi-file"
+            severity="success"
+            [loading]="loading()"
+            (onClick)="generateCertificate(selectedProgress!)"
+          />
+        }
+      </div>
+    </div>
+  </ng-template>
+</p-dialog>

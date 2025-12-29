@@ -1,0 +1,109 @@
+<div data-cy="dashboard-container" class="grid grid-nogutter surface-section">
+  
+  <!-- Loading State -->
+  <div data-cy="stats-loading" *ngIf="loading" class="col-12 flex justify-content-center align-items-center py-8">
+    <p-progressSpinner styleClass="w-6rem h-6rem" strokeWidth="8"></p-progressSpinner>
+    <span class="ml-3 text-xl">Loading dashboard stats...</span>
+  </div>
+
+  <!-- Error State -->
+  <div data-cy="dashboard-error" *ngIf="error" class="col-12">
+    <p-card>
+      <ng-template pTemplate="header">
+        <i class="pi pi-exclamation-triangle mr-2"></i>
+        Dashboard Error
+      </ng-template>
+      <p class="m-0 text-red-500">{{ error }}</p>
+    </p-card>
+  </div>
+
+  <!-- Task Status Widget (YOUR EXISTING WIDGET - 3 cards) -->
+  <div *ngIf="!loading && !error" class="col-12 mb-6">
+    <div data-cy="task-status-widget">
+      <app-status-widget></app-status-widget>
+    </div>
+  </div>
+
+  <!-- Navigation Cards -->
+  <div class="grid">
+    
+    <!-- Candidate Pipeline -->
+    <div class="col-12 md:col-6 lg:col-3 mb-4">
+      <p-card 
+        data-cy="pipeline-nav-card"
+        class="cursor-pointer hover:shadow-4 transition-duration-200 h-full"
+        routerLink="/candidate-pipeline">
+        <div class="flex align-items-center h-full">
+          <i class="pi pi-sitemap text-3xl text-primary mr-4"></i>
+          <div class="flex-1">
+            <h3 class="m-0 mb-1 text-xl">Candidate Pipeline</h3>
+            <span class="text-600">1,100+ applications across 5 stages</span>
+          </div>
+        </div>
+      </p-card>
+    </div>
+    
+    <!-- Executives -->
+    <div class="col-12 md:col-6 lg:col-3 mb-4">
+      <p-card 
+        data-cy="executives-nav-card"
+        class="cursor-pointer hover:shadow-4 transition-duration-200 h-full"
+        routerLink="/executives">
+        <div class="flex align-items-center h-full">
+          <i class="pi pi-users text-3xl text-green-500 mr-4"></i>
+          <div class="flex-1">
+            <h3 class="m-0 mb-1 text-xl">Executives</h3>
+            <span class="text-600">75K+ field executives</span>
+          </div>
+        </div>
+      </p-card>
+    </div>
+    
+    <!-- Jobs -->
+    <div class="col-12 md:col-6 lg:col-3 mb-4">
+      <p-card 
+        data-cy="jobs-nav-card"
+        class="cursor-pointer hover:shadow-4 transition-duration-200 h-full"
+        routerLink="/jobs">
+        <div class="flex align-items-center h-full">
+          <i class="pi pi-briefcase text-3xl text-orange-500 mr-4"></i>
+          <div class="flex-1">
+            <h3 class="m-0 mb-1 text-xl">Job Postings</h3>
+            <span class="text-600">3 active job postings</span>
+          </div>
+        </div>
+      </p-card>
+    </div>
+    
+    <!-- Tasks -->
+    <div class="col-12 md:col-6 lg:col-3 mb-4">
+      <p-card 
+        data-cy="tasks-nav-card"
+        class="cursor-pointer hover:shadow-4 transition-duration-200 h-full"
+        routerLink="/tasks">
+        <div class="flex align-items-center h-full">
+          <i class="pi pi-check-square text-3xl text-blue-500 mr-4"></i>
+          <div class="flex-1">
+            <h3 class="m-0 mb-1 text-xl">Task Management</h3>
+            <span class="text-600">60+ active tasks</span>
+          </div>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Other Widgets (if they exist) -->
+  <div *ngIf="!loading && !error" class="col-12 mt-6">
+    <div class="grid">
+      <div class="col-12 lg:col-8" data-cy="top-executives-section">
+        <app-top-executives-widget></app-top-executives-widget>
+      </div>
+      <div class="col-12 lg:col-4" data-cy="recent-submissions-section">
+        <app-recent-submissions-widget></app-recent-submissions-widget>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p-toast data-cy="toast-container"></p-toast>

@@ -1,0 +1,491 @@
+<div class="quiz-manager-root">
+    <!-- Header -->
+    <div class="quiz-header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="header-icon-wrapper">
+                    <i class="pi pi-question-circle header-icon"></i>
+                    <h1>Quiz Manager</h1>
+                </div>
+                <p>Create and manage quiz questions for training courses</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-section">
+        <div class="filters-grid">
+            <div class="filter-group">
+                <label><i class="pi pi-book"></i> Select Course</label>
+                <p-select
+                    [options]="coursesDropdown"
+                    [(ngModel)]="selectedCourse"
+                    (onChange)="onCourseChange($event)"
+                    placeholder="Choose a course"
+                    [disabled]="loading()"
+                />
+            </div>
+
+            <div class="filter-group">
+                <label><i class="pi pi-list"></i> Select Quiz Module</label>
+                <p-select
+                    [options]="modulesDropdown"
+                    [(ngModel)]="selectedModule"
+                    (onChange)="onModuleChange($event)"
+                    placeholder="Choose a quiz module"
+                    [disabled]="
+                        !selectedCourse() || modulesDropdown.length === 0
+                    "
+                />
+            </div>
+
+            <div class="filter-actions">
+                <p-button
+                    label="Add Question"
+                    icon="pi pi-plus"
+                    (onClick)="showAddDialog()"
+                    [disabled]="!selectedModule()"
+                />
+
+                <p-button
+                    label="Import CSV"
+                    icon="pi pi-upload"
+                    severity="secondary"
+                    (onClick)="fileUpload.choose()"
+                    [disabled]="!selectedModule()"
+                />
+
+                <p-button
+                    label="Download Template"
+                    icon="pi pi-download"
+                    severity="secondary"
+                    [outlined]="true"
+                    (onClick)="downloadTemplate()"
+                />
+            </div>
+        </div>
+    </div>
+
+    <!-- CSV instructions - ALWAYS VISIBLE -->
+    <div class="csv-instructions-panel">
+        <h3>How to prepare the Excel / CSV file</h3>
+        <p>
+            Please follow these steps slowly. The file
+            <strong>must</strong> match this format, otherwise questions will
+            not import correctly.
+        </p>
+
+        <div class="csv-steps-grid">
+            <div class="csv-step-card">
+                <h4>Step 1 – Open Excel / Sheets</h4>
+                <p>
+                    Open a new blank sheet in Excel, Google Sheets, or
+                    LibreOffice Calc.
+                </p>
+            </div>
+
+            <div class="csv-step-card">
+                <h4>Step 2 – Create headers (Row 1)</h4>
+                <p>
+                    In the first row (Row 1), create these columns, one per
+                    cell:
+                </p>
+                <pre class="csv-code">
+questionText | questionType | correctAnswer | optionA | optionB | optionC | optionD | points | explanation | difficulty
+                </pre>
+                <p>
+                    Type them <strong>exactly</strong> like this (same spelling,
+                    no extra spaces, no extra columns).
+                </p>
+            </div>
+
+            <div class="csv-step-card">
+                <h4>Step 3 – Fill one question per row</h4>
+                <p>Each next row (Row 2, Row 3, …) is one question.</p>
+                <ul>
+                    <li><strong>questionText</strong>: the full question.</li>
+                    <li>
+                        <strong>questionType</strong>: must be exactly one of:
+                        multiple_choice, true_false, short_answer (all
+                        lowercase, with underscore).
+                    </li>
+                    <li>
+                        <strong>correctAnswer</strong>: <br />- for multiple
+                        choice: A, B, C, or D <br />- for true/false: true or
+                        false <br />- for short answer: the expected text
+                        answer.
+                    </li>
+                    <li>
+                        <strong>optionA – optionD</strong>: for multiple_choice,
+                        fill at least A and B. C and D are optional. For
+                        true_false and short_answer you can leave them empty.
+                    </li>
+                    <li><strong>points</strong>: a number like 5, 10, etc.</li>
+                    <li>
+                        <strong>explanation</strong>: short explanation (can be
+                        empty).
+                    </li>
+                    <li>
+                        <strong>difficulty</strong>: must be exactly easy,
+                        medium, or hard.
+                    </li>
+                </ul>
+            </div>
+
+            <div class="csv-step-card">
+                <h4>Step 4 – Example row</h4>
+                <p>
+                    This is how a correct multiple choice question looks in
+                    Excel:
+                </p>
+                <table class="csv-example-table">
+                    <thead>
+                        <tr>
+                            <th>questionText</th>
+                            <th>questionType</th>
+                            <th>correctAnswer</th>
+                            <th>optionA</th>
+                            <th>optionB</th>
+                            <th>optionC</th>
+                            <th>optionD</th>
+                            <th>points</th>
+                            <th>explanation</th>
+                            <th>difficulty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>What is 2 + 2?</td>
+                            <td>multiple_choice</td>
+                            <td>A</td>
+                            <td>4</td>
+                            <td>3</td>
+                            <td>5</td>
+                            <td>6</td>
+                            <td>5</td>
+                            <td>Basic math question.</td>
+                            <td>easy</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>
+                    Every new question is just another row under this, with the
+                    same column order.
+                </p>
+            </div>
+
+            <div class="csv-step-card">
+                <h4>Step 5 – Save as CSV</h4>
+                <p>When all questions are filled:</p>
+                <ul>
+                    <li>
+                        Excel:
+                        <strong>File → Save As → CSV (Comma delimited)</strong>.
+                    </li>
+                    <li>
+                        Google Sheets:
+                        <strong
+                            >File → Download → Comma-separated values
+                            (.csv)</strong
+                        >.
+                    </li>
+                </ul>
+                <p>
+                    Save the file. This is the file you will upload with "Import
+                    CSV".
+                </p>
+            </div>
+
+            <div class="csv-step-card warning-card">
+                <h4>Common mistakes to avoid</h4>
+                <ul>
+                    <li>
+                        Do <strong>not</strong> rename or reorder the headers.
+                    </li>
+                    <li>Do <strong>not</strong> add extra columns.</li>
+                    <li>
+                        <strong>questionType</strong> must be exactly
+                        multiple_choice, true_false, or short_answer.
+                    </li>
+                    <li>
+                        <strong>difficulty</strong> must be exactly easy,
+                        medium, or hard.
+                    </li>
+                    <li>File must be <strong>.csv</strong>, not .xlsx.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="csv-upload-hint">
+            <p>
+                Tip: Start with 2–3 questions in one CSV, upload and check. If
+                everything looks correct, then prepare a bigger file.
+            </p>
+        </div>
+    </div>
+
+    <!-- Questions Section - only when module selected -->
+    @if (selectedModule()) {
+        <div class="questions-section">
+            <div class="questions-header">
+                <div class="questions-title">
+                    <i class="pi pi-list-check"></i>
+                    <h2>Questions</h2>
+                    @if (quizQuestions().length > 0) {
+                        <span class="question-count">{{
+                            quizQuestions().length
+                        }}</span>
+                    }
+                </div>
+            </div>
+
+            <div class="questions-content">
+                @if (loadingQuestions()) {
+                    <div class="loading-container">
+                        <p-progressSpinner />
+                        <p>Loading questions...</p>
+                    </div>
+                } @else if (quizQuestions().length === 0) {
+                    <div class="questions-empty">
+                        <i class="pi pi-inbox"></i>
+                        <h3>No Questions Yet</h3>
+                        <p>Add questions manually or import from a CSV file</p>
+                    </div>
+                } @else {
+                    <div class="questions-grid">
+                        @for (
+                            question of quizQuestions();
+                            track question._id;
+                            let i = $index
+                        ) {
+                            <div class="question-card">
+                                <div class="question-header">
+                                    <span class="question-number"
+                                        >Q{{ i + 1 }}</span
+                                    >
+                                    <p class="question-text">
+                                        {{ question.questionText }}
+                                    </p>
+                                    <div class="question-actions">
+                                        <p-button
+                                            icon="pi pi-pencil"
+                                            [rounded]="true"
+                                            [text]="true"
+                                            severity="info"
+                                            (onClick)="editQuestion(question)"
+                                        />
+                                        <p-button
+                                            icon="pi pi-trash"
+                                            [rounded]="true"
+                                            [text]="true"
+                                            severity="danger"
+                                            (onClick)="deleteQuestion(question)"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div class="question-meta">
+                                    <p-tag
+                                        [value]="question.questionType"
+                                        [severity]="
+                                            getTypeBadgeSeverity(
+                                                question.questionType
+                                            )
+                                        "
+                                        icon="pi pi-tag"
+                                    />
+                                    <p-tag
+                                        [value]="question.difficulty"
+                                        [severity]="
+                                            getDifficultyBadgeSeverity(
+                                                question.difficulty
+                                            )
+                                        "
+                                        icon="pi pi-chart-line"
+                                    />
+                                    <p-tag
+                                        [value]="question.points + ' pts'"
+                                        severity="secondary"
+                                        icon="pi pi-star"
+                                    />
+                                </div>
+
+                                @if (
+                                    question.options &&
+                                    question.options.length > 0
+                                ) {
+                                    <div class="question-options">
+                                        <div class="options-title">
+                                            <i class="pi pi-list"></i>
+                                            <span>Answer Options</span>
+                                        </div>
+                                        <div class="options-grid">
+                                            @for (
+                                                option of question.options;
+                                                track $index;
+                                                let idx = $index
+                                            ) {
+                                                <div
+                                                    class="option-item"
+                                                    [class.is-correct]="
+                                                        String.fromCharCode(
+                                                            65 + idx
+                                                        ) ===
+                                                        question.correctAnswer
+                                                    "
+                                                >
+                                                    <span class="option-label">
+                                                        {{
+                                                            String.fromCharCode(
+                                                                65 + idx
+                                                            )
+                                                        }}
+                                                    </span>
+                                                    <span class="option-text">{{
+                                                        option
+                                                    }}</span>
+                                                    @if (
+                                                        String.fromCharCode(
+                                                            65 + idx
+                                                        ) ===
+                                                        question.correctAnswer
+                                                    ) {
+                                                        <i
+                                                            class="pi pi-check-circle"
+                                                        ></i>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (question.explanation) {
+                                    <div class="question-explanation">
+                                        <div class="explanation-title">
+                                            <i class="pi pi-info-circle"></i>
+                                            <span>Explanation</span>
+                                        </div>
+                                        <p class="explanation-text">
+                                            {{ question.explanation }}
+                                        </p>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Add/Edit Dialog -->
+<p-dialog
+    [(visible)]="showQuestionDialog"
+    [header]="editMode ? 'Edit Question' : 'Add Question'"
+    [modal]="true"
+    [style]="{ width: '600px' }"
+    styleClass="quiz-question-dialog"
+>
+    <form [formGroup]="questionForm" (ngSubmit)="submitQuestion()">
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="required">Question Text</label>
+                <textarea
+                    pInputTextarea
+                    formControlName="questionText"
+                    rows="3"
+                ></textarea>
+            </div>
+
+            <div class="form-group">
+                <label class="required">Question Type</label>
+                <p-select
+                    formControlName="questionType"
+                    [options]="questionTypes"
+                />
+            </div>
+
+            @if (isMultipleChoice()) {
+                <div class="options-grid">
+                    <div class="form-group">
+                        <label class="required">Option A</label>
+                        <input pInputText formControlName="optionA" />
+                    </div>
+                    <div class="form-group">
+                        <label class="required">Option B</label>
+                        <input pInputText formControlName="optionB" />
+                    </div>
+                    <div class="form-group">
+                        <label class="required">Option C</label>
+                        <input pInputText formControlName="optionC" />
+                    </div>
+                    <div class="form-group">
+                        <label class="required">Option D</label>
+                        <input pInputText formControlName="optionD" />
+                    </div>
+                </div>
+            }
+
+            <div class="form-group">
+                <label class="required">Correct Answer</label>
+                <input pInputText formControlName="correctAnswer" />
+                <small class="help-text">
+                    For MCQ: A, B, C, or D. For True/False: true or false
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label>Points</label>
+                <p-inputNumber formControlName="points" [min]="1" />
+            </div>
+
+            <div class="form-group">
+                <label>Difficulty</label>
+                <p-select
+                    formControlName="difficulty"
+                    [options]="difficultyLevels"
+                />
+            </div>
+
+            <div class="form-group">
+                <label>Explanation (Optional)</label>
+                <textarea
+                    pInputTextarea
+                    formControlName="explanation"
+                    rows="2"
+                ></textarea>
+            </div>
+        </div>
+    </form>
+
+    <ng-template pTemplate="footer">
+        <p-button
+            label="Cancel"
+            icon="pi pi-times"
+            [text]="true"
+            (onClick)="showQuestionDialog = false"
+        />
+        <p-button
+            label="{{ editMode ? 'Update' : 'Add' }}"
+            icon="pi pi-check"
+            (onClick)="submitQuestion()"
+            [disabled]="questionForm.invalid"
+        />
+    </ng-template>
+</p-dialog>
+
+<!-- Hidden File Upload -->
+<p-fileUpload
+    #fileUpload
+    mode="basic"
+    [auto]="true"
+    accept=".csv"
+    (onSelect)="uploadCSV($event)"
+    [style]="{ display: 'none' }"
+/>
+
+<!-- Toast & Confirm Dialog -->
+<p-toast />
+<p-confirmDialog />

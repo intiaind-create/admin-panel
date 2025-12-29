@@ -1,0 +1,164 @@
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  h2 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+
+    i {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+.drawer-loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  gap: 1rem;
+
+  .loading-text {
+    color: #6b7280;
+  }
+}
+
+.drawer-no-data {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  color: #6b7280;
+  text-align: center;
+
+  h3 {
+    margin: 0.5rem 0;
+    color: #374151;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.drawer-content {
+  padding: 1.5rem;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+
+  .profile-header {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #e5e7eb;
+
+    .profile-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+
+      &.admin-avatar {
+        background: linear-gradient(135deg, #3b82f6, #1e40af);
+        i {
+          font-size: 2rem;
+          color: white;
+        }
+      }
+
+      &.executive-avatar {
+        background: linear-gradient(135deg, #10b981, #059669);
+        i {
+          font-size: 2rem;
+          color: white;
+        }
+      }
+    }
+
+    .profile-info {
+      flex: 1;
+
+      h1 {
+        margin: 0 0 0.25rem 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #111827;
+      }
+
+      .profile-email {
+        margin: 0 0 0.75rem 0;
+        color: #1e40af;
+        font-weight: 500;
+        font-size: 1rem;
+      }
+
+      .status-tag {
+        font-size: 0.85rem;
+      }
+    }
+  }
+
+  .detail-section {
+    margin-bottom: 2rem;
+
+    h3 {
+      margin: 0 0 1rem 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #111827;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .detail-row {
+      display: flex;
+      margin-bottom: 0.75rem;
+      gap: 1rem;
+
+      .label {
+        font-weight: 600;
+        color: #6b7280;
+        min-width: 100px;
+        font-size: 0.9rem;
+      }
+
+      .value {
+        flex: 1;
+        color: #374151;
+        font-weight: 500;
+      }
+
+      .text-muted {
+        color: #9ca3af;
+        font-size: 0.85rem;
+      }
+
+      .role-badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+
+        &.badge-super-admin { background: linear-gradient(135deg, #dc2626, #991b1b); color: white; }
+        &.badge-state { background: linear-gradient(135deg, #7c3aed, #5b21b6); color: white; }
+        &.badge-zonal { background: linear-gradient(135deg, #2563eb, #1e40af); color: white; }
+        &.badge-district { background: linear-gradient(135deg, #0891b2, #0e7490); color: white; }
+        &.badge-coordinator { background: linear-gradient(135deg, #10b981, #059669); color: white; }
+      }
+    }
+  }
+}

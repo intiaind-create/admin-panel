@@ -1,0 +1,5 @@
+<ul class="layout-menu">
+    @for (item of model(); track $index) {
+        <li app-menuitem [item]="item" [index]="$index" [root]="true"></li>
+    }
+</ul>

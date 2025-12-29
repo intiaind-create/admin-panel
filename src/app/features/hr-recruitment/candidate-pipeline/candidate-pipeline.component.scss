@@ -1,0 +1,647 @@
+// ============================================
+// CANDIDATE PIPELINE – ENTERPRISE DESIGN
+// ============================================
+
+$primary-blue: #1e40af;
+$primary-blue-light: #3b82f6;
+$neutral-50: #f9fafb;
+$neutral-100: #f3f4f6;
+$neutral-200: #e5e7eb;
+$neutral-300: #d1d5db;
+$neutral-500: #6b7280;
+$neutral-700: #374151;
+$neutral-900: #111827;
+
+// Root container
+.candidate-pipeline-container {
+  padding: 2rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background: $neutral-50;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+// ============================================
+// Header with job filter
+// ============================================
+.pipeline-header {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 16px;
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  border: 1px solid $neutral-200;
+
+  h2 {
+    margin: 0;
+    color: $neutral-900;
+    font-size: 1.6rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    &::before {
+      content: '';
+      width: 8px;
+      height: 24px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, $primary-blue-light, $primary-blue);
+    }
+  }
+
+  .job-filter {
+    width: 360px;
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+
+    ::ng-deep .job-select {
+      width: 100%;
+
+      .p-select-label {
+        font-size: 0.9rem;
+      }
+    }
+
+    .job-option {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.35rem 0;
+
+      .job-title {
+        font-weight: 500;
+        color: $neutral-900;
+        font-size: 0.9rem;
+      }
+
+      .job-count {
+        font-size: 0.8rem;
+        color: $neutral-500;
+        background: $neutral-100;
+        padding: 0.15rem 0.5rem;
+        border-radius: 999px;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+// ============================================
+// Location filter card
+// ============================================
+.location-filters {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem 1.75rem;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  border: 1px solid $neutral-200;
+
+  .filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+
+    h3 {
+      margin: 0;
+      color: $neutral-900;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .clear-btn {
+      color: $neutral-500;
+    }
+  }
+
+  .filter-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .filter-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    &.full-width {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: $neutral-700;
+    }
+
+    ::ng-deep .filter-select {
+      width: 100%;
+
+      .p-select {
+        width: 100%;
+      }
+    }
+  }
+
+  // Quick ward search input
+  .ward-search-input {
+    width: 100%;
+    padding: 0.7rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid $neutral-300;
+    font-size: 0.95rem;
+    transition: all 0.15s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-blue;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+  }
+
+  // Ward search results dropdown
+  .ward-search-results {
+    max-height: 260px;
+    overflow-y: auto;
+    border: 1px solid $neutral-200;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    background: white;
+    box-shadow: 0 6px 12px rgba(15, 23, 42, 0.12);
+  }
+
+  .ward-result-item {
+    padding: 0.7rem 0.9rem;
+    cursor: pointer;
+    border-bottom: 1px solid $neutral-100;
+    transition: background 0.15s ease;
+
+    &:hover {
+      background: $neutral-50;
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    strong {
+      display: block;
+      color: $neutral-900;
+      margin-bottom: 0.15rem;
+      font-size: 0.9rem;
+    }
+
+    .ward-path {
+      display: block;
+      font-size: 0.8rem;
+      color: $neutral-500;
+    }
+  }
+
+  .search-loading,
+  .no-results {
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    color: $neutral-500;
+
+    i {
+      margin-right: 0.25rem;
+    }
+  }
+
+  .filter-divider {
+    text-align: center;
+    color: $neutral-500;
+    font-size: 0.8rem;
+    margin: 0.75rem 0 1rem 0;
+    position: relative;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: $neutral-200;
+    }
+
+    &::before {
+      left: 0;
+    }
+
+    &::after {
+      right: 0;
+    }
+  }
+}
+
+// ============================================
+// Loading + empty states
+// ============================================
+.loading-state,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 2.5rem 1rem;
+  border-radius: 16px;
+  background: #ffffff;
+  border: 1px solid $neutral-200;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  color: $neutral-500;
+  font-size: 0.95rem;
+
+  i {
+    font-size: 2.2rem;
+    color: $primary-blue-light;
+  }
+
+  p {
+    margin: 0;
+    color: $neutral-700;
+  }
+}
+
+// ============================================
+// Pipeline stages board
+// ============================================
+.pipeline-stages {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid $neutral-200;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  padding: 1rem;
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+
+  app-pipeline-stage {
+    min-width: 280px;
+    flex: 1;
+  }
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $neutral-200;
+    border-radius: 999px;
+  }
+}
+
+// ============================================
+// Candidate detail drawer
+// ============================================
+::ng-deep .p-drawer {
+  .p-drawer-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid $neutral-200;
+
+    h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: $neutral-900;
+    }
+  }
+
+  .p-drawer-content {
+    padding: 1.25rem 1.5rem;
+    background: $neutral-50;
+  }
+
+  .p-drawer-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid $neutral-200;
+    background: #ffffff;
+  }
+}
+
+// ============================================
+// Responsive adjustments
+// ============================================
+@media (max-width: 1024px) {
+  .location-filters .filter-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .candidate-pipeline-container {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .pipeline-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.25rem;
+
+    h2 {
+      font-size: 1.4rem;
+    }
+
+    .job-filter {
+      width: 100%;
+    }
+  }
+
+  .location-filters {
+    padding: 1.25rem;
+
+    .filter-row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .filter-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+
+  .pipeline-stages {
+    flex-direction: column;
+    overflow-x: visible;
+    padding: 0.75rem;
+
+    app-pipeline-stage {
+      min-width: 100%;
+    }
+  }
+
+  ::ng-deep .p-drawer {
+    .p-drawer {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .location-filters .filter-row {
+    grid-template-columns: 1fr;
+  }
+
+  .pipeline-header h2 {
+    font-size: 1.25rem;
+
+    &::before {
+      width: 6px;
+      height: 20px;
+    }
+  }
+}
+
+// ============================================
+// Additional polish & overrides
+// ============================================
+
+// Ensure PrimeNG components inherit proper sizing
+::ng-deep {
+  .job-select,
+  .filter-select {
+    .p-select {
+      width: 100%;
+      border-radius: 8px;
+      border-color: $neutral-300;
+      transition: all 0.15s ease;
+
+      &:hover {
+        border-color: $neutral-500;
+      }
+
+      &:focus,
+      &.p-focus {
+        border-color: $primary-blue;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      }
+    }
+
+    .p-select-label {
+      font-size: 0.95rem;
+      color: $neutral-900;
+    }
+
+    .p-select-dropdown {
+      color: $neutral-500;
+    }
+  }
+
+  // Dropdown panel styling
+  .p-select-overlay {
+    border-radius: 8px;
+    border: 1px solid $neutral-200;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+
+    .p-select-option {
+      padding: 0.6rem 0.85rem;
+      transition: background 0.15s ease;
+
+      &:hover {
+        background: $neutral-50;
+      }
+
+      &.p-selected {
+        background: rgba(37, 99, 235, 0.1);
+        color: $primary-blue;
+      }
+    }
+  }
+
+  // Toast positioning
+  .p-toast {
+    z-index: 9999;
+  }
+
+  .p-toast-message {
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.15);
+  }
+}
+
+// Button overrides in filter header
+.location-filters .filter-header {
+  ::ng-deep .p-button.p-button-text {
+    color: $neutral-500;
+    
+    &:hover {
+      background: $neutral-100;
+      color: $neutral-700;
+    }
+  }
+}
+
+// Ensure no layout shift when scrollbar appears/disappears
+.pipeline-stages {
+  scrollbar-gutter: stable;
+}
+
+// Loading spinner animation polish
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-state i.pi-spinner,
+.search-loading i.pi-spinner {
+  animation: spin 1s linear infinite;
+}
+app-pipeline-stage {
+  display: block;
+  background: #f3f4f6;
+  border-radius: 16px;
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+}
+
+/* Use the inner wrapper class if you have one */
+app-pipeline-stage .stage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+app-pipeline-stage .stage-header-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+app-pipeline-stage .stage-header-count {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+/* Stack cards with clean spacing */
+app-pipeline-stage .stage-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+/* === Candidate cards === */
+app-candidate-card,
+.candidate-card {
+  display: block;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  cursor: pointer;
+}
+
+app-candidate-card:hover,
+.candidate-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.14);
+  border-color: #3b82f6;
+}
+
+/* Avatar + info row */
+.candidate-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.candidate-card-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #ffffff;
+  background: #10b981;
+}
+
+.candidate-card-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.candidate-card-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 0.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.candidate-card-email {
+  font-size: 0.8rem;
+  color: #6b7280;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Meta row at bottom of card */
+.candidate-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid #f3f4f6;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+/* Drag preview placeholder */
+.cdk-drag-preview.candidate-card {
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.2);
+  transform: rotate(2deg);
+}
+
+.cdk-drag-placeholder.candidate-card {
+  opacity: 0.3;
+  background: #e5e7eb;
+  border: 2px dashed #d1d5db;
+}

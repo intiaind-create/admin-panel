@@ -1,0 +1,51 @@
+<p-toast></p-toast>
+<div class="card">
+    <h2 class="text-2xl font-semibold mb-4">Manage Certificate Template</h2>
+    <p class="text-surface-500 mb-6">
+        Upload the single "blanket" PDF template that will be issued for all course completions.
+    </p>
+
+    <div class="border rounded-lg p-4">
+        @if (currentTemplate$ | async; as template) {
+            <h3 class="font-semibold text-lg mb-4">Current Template</h3>
+            <div class="flex items-center">
+                <i class="pi pi-file-pdf text-4xl text-red-500 mr-4"></i>
+                <div>
+                    <div class="font-semibold">{{ template.fileName }}</div>
+                    <div class="text-sm text-surface-500">Uploaded on: {{ template.uploadDate | date:'longDate' }}</div>
+                </div>
+            </div>
+        } @else {
+            <div class="text-center p-4">
+                <p class="text-surface-500">No certificate template is currently saved.</p>
+            </div>
+        }
+    </div>
+
+    <div class="mt-6">
+        <h3 class="font-semibold text-lg mb-4">Upload and Preview New Template</h3>
+        <p-fileUpload 
+            name="certificate" 
+            accept="application/pdf" 
+            [multiple]="false" 
+            [customUpload]="true"
+            (onSelect)="onSelect($event)"
+            [showUploadButton]="false" 
+            [showCancelButton]="false"
+            chooseLabel="Select PDF to Preview">
+        </p-fileUpload>
+    </div>
+</div>
+
+@if (showPreview && previewUrl) {
+    <div class="card mt-4">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-semibold text-lg">New Template Preview</h3>
+            <div class="flex gap-2">
+                <p-button label="Cancel" icon="pi pi-times" styleClass="p-button-secondary" (click)="closePreview()"></p-button>
+                <p-button label="Confirm Upload" icon="pi pi-check" (click)="confirmUpload()"></p-button>
+            </div>
+        </div>
+        <iframe [src]="previewUrl" width="100%" height="700px" style="border: 1px solid var(--surface-border);"></iframe>
+    </div>
+}

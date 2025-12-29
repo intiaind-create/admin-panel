@@ -1,0 +1,62 @@
+<div class="pipeline-stage">
+  <!-- Stage header + search -->
+  <div class="stage-header">
+    <div class="stage-header-top">
+      <span class="stage-header-title">
+        {{ stage.title }}
+      </span>
+
+      <span class="stage-header-count">
+        {{ stage.totalCount }}
+      </span>
+    </div>
+
+<div class="stage-search-wrapper p-input-icon-left">
+  <i class="pi pi-search"></i>
+  <input
+    type="text"
+    pInputText
+    class="stage-search"
+    placeholder="Search name, email, phone..."
+    [(ngModel)]="searchTerm"
+  />
+</div>
+  </div>
+
+  <!-- Cards list with drag-drop -->
+  <div
+    class="stage-cards"
+    cdkDropList
+    [cdkDropListData]="stage.candidates"
+    (cdkDropListDropped)="onDrop($event)"
+  >
+    <ng-container *ngIf="filteredCandidates.length; else emptyState">
+      <app-candidate-card
+        *ngFor="let candidate of filteredCandidates"
+        class="candidate-card"
+        cdkDrag
+        [card]="candidate"
+        [stageId]="stage.stageId"
+        (click)="onCardClicked(candidate)"
+      ></app-candidate-card>
+
+      <!-- Load more button -->
+      <button
+        *ngIf="!stage.isDone"
+        pButton
+        type="button"
+        label="Load more"
+        class="load-more-btn p-button-text"
+        (click)="onLoadMore()"
+      ></button>
+    </ng-container>
+
+    <!-- Empty column state -->
+    <ng-template #emptyState>
+      <div class="empty-stage">
+        <i class="pi pi-inbox"></i>
+        <span>No candidates in this stage</span>
+      </div>
+    </ng-template>
+  </div>
+</div>

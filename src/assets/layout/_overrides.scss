@@ -1,0 +1,56 @@
+p-select {
+  display: inline-flex;
+  width: 100%;
+  
+  .p-select {
+    width: 100%;
+  }
+}
+
+// Fix: p-inputnumber display
+p-inputnumber {
+  display: block;
+  width: 100%;
+  
+  .p-inputnumber {
+    width: 100%;
+  }
+}
+
+// Fix: p-button inline display
+p-button {
+  display: inline-flex;
+  
+  .p-button {
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+// Fix: p-tree border conflicts
+p-tree {
+  display: block;
+  
+  .p-tree {
+    border: none;
+  }
+  
+  .p-tree-node-checkbox {
+    display: block;
+  }
+}
+
+// Fix: p-chart canvas sizing
+p-chart {
+  display: block;
+  
+  canvas {
+    max-width: 100%;
+    height: auto !important;
+  }
+}
+
+// Fix: p-tooltip positioning
+.p-tooltip {
+  z-index: 9999 !important;
+}

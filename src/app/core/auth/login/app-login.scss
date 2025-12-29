@@ -1,0 +1,247 @@
+/* Background SVG */
+:host ::ng-deep .login-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: radial-gradient(circle at top left, #e0ebff 0, transparent 50%),
+              radial-gradient(circle at bottom right, #e3f7ff 0, transparent 55%);
+}
+
+/* Page shell */
+:host {
+  min-height: 100vh;
+  display: block;
+  position: relative;
+  background: #f4f6fb;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI",
+    sans-serif;
+}
+
+:host ::ng-deep .login-page {
+  position: relative;
+  z-index: 1;
+}
+
+/* Top logo / brand */
+:host ::ng-deep .login-header {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem 3.5rem 0.75rem;
+}
+
+:host ::ng-deep .login-header-logo {
+  font-weight: 800;
+  font-size: 1.1rem;
+  letter-spacing: 0.12em;
+  color: #05b48c; /* adjust to your brand */
+}
+
+/* Center shell */
+:host ::ng-deep .login-shell {
+  min-height: calc(100vh - 4rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 2rem 3rem;
+}
+
+/* Main panel – wide and light */
+:host ::ng-deep .login-panel {
+  width: 900px;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 2.5rem;
+  border-radius: 18px;
+  padding: 2.4rem 2.8rem;
+  background: #ffffff;
+  border: 1px solid #e4e8f5;
+  box-shadow: 0 20px 55px rgba(15, 35, 95, 0.08);
+}
+
+/* LEFT: titles */
+:host ::ng-deep .login-main .login-title {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 0.25rem;
+}
+
+:host ::ng-deep .login-main .login-subtitle {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+/* Inputs – corporate look */
+:host ::ng-deep .p-iconfield {
+  position: relative;
+}
+
+:host ::ng-deep .p-inputtext {
+  width: 100%;
+  border-radius: 12px !important;
+  border: 1px solid #dde3f3 !important;
+  padding: 0.85rem 1rem 0.85rem 2.6rem;
+  background: #f7f9ff !important;
+  color: #111827 !important;
+  font-size: 0.9rem;
+  box-shadow: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+:host ::ng-deep .p-inputtext::placeholder {
+  color: #8b94b2;
+}
+
+:host ::ng-deep .p-inputtext:focus {
+  outline: none;
+  border-color: #3252ff !important;
+  box-shadow: 0 0 0 2px rgba(50, 82, 255, 0.15);
+}
+:host ::ng-deep p-iconfield {
+  position: relative;
+}
+:host ::ng-deep p-iconfield .pi-lock {
+  position: absolute;
+  left: 1rem;          /* adjust if needed */
+  transform: translateY(-50%);
+  margin-top: 1.2rem;
+  color: #8a95b0;
+  font-size: 1.05rem;
+  padding-bottom: 2.5rem;
+}
+
+:host ::ng-deep p-iconfield .p-button.p-button-text {
+  position: absolute;
+  right: 0.9rem;       /* distance from right edge */
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 0;
+  min-width: auto;
+  height: auto;
+  color: #3252FF;
+}
+
+/* Icons inside fields */
+:host ::ng-deep .p-input-icon-left > i {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-top: 0;              /* remove any inherited offset */
+  color: #8a95b0;
+  font-size: 1.05rem;
+}
+
+/* Error text */
+:host ::ng-deep .p-error {
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+  color: #e11d48 !important;
+}
+
+/* Remember + reset row */
+:host ::ng-deep .login-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.84rem;
+  color: #6a728a;
+}
+
+:host ::ng-deep .login-meta .p-checkbox .p-checkbox-box {
+  border-radius: 5px;
+  border-color: #c9d1ea;
+}
+
+:host ::ng-deep .login-meta a {
+  margin-left: auto;
+  font-weight: 600;
+  color: #3252ff;
+  text-decoration: none;
+}
+
+:host ::ng-deep .login-meta a:hover {
+  text-decoration: underline;
+}
+
+/* Login button styled like primary actions */
+:host ::ng-deep .login-button {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid #3252ff;
+  padding: 0.85rem 1.2rem;
+  background: #3252ff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+  box-shadow: 0 10px 28px rgba(16, 41, 120, 0.25);
+  transition: background 0.12s ease, box-shadow 0.12s ease, transform 0.12s ease;
+}
+
+:host ::ng-deep .login-button:hover:not(:disabled) {
+  background: #2844d8;
+  transform: translateY(-1px);
+  box-shadow: 0 14px 32px rgba(16, 41, 120, 0.32);
+}
+
+:host ::ng-deep .login-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* RIGHT: side info */
+:host ::ng-deep .login-side {
+  border-left: 1px dashed #e1e6f5;
+  padding-left: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+:host ::ng-deep .login-side-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.6rem;
+}
+
+:host ::ng-deep .login-side-text {
+  font-size: 0.85rem;
+  color: #6c7691;
+  line-height: 1.5;
+  margin-bottom: 0.6rem;
+}
+
+/* Dialog styling (forgot password) */
+:host ::ng-deep .p-dialog .p-dialog-content {
+  background: #f7f8fc;
+}
+
+:host ::ng-deep .p-dialog .p-inputtext {
+  background: #ffffff !important;
+  border-radius: 10px !important;
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+  :host ::ng-deep .login-panel {
+    grid-template-columns: 1fr;
+    padding: 2rem 1.75rem;
+  }
+
+  :host ::ng-deep .login-side {
+    display: none;
+  }
+
+  :host ::ng-deep .login-shell {
+    padding: 1rem;
+  }
+
+  :host ::ng-deep .login-header {
+    padding-inline: 1.5rem;
+  }
+}

@@ -1,0 +1,259 @@
+<!-- task-approve.component.html -->
+<div class="task-approve-container">
+    <p-confirmdialog></p-confirmdialog>
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 class="page-title">
+          <i class="pi pi-check-circle"></i>
+          Tasks Pending Approval
+        </h1>
+        <p class="page-subtitle">
+          Review and approve {{ tasks.length }} completed tasks
+        </p>
+      </div>
+      <button
+        pButton
+        type="button"
+        label="Refresh"
+        icon="pi pi-refresh"
+        class="refresh-btn"
+        [loading]="isLoading"
+        (click)="loadTasks()"
+      ></button>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section">
+    <div class="search-wrapper">
+      <p-iconfield iconPosition="left">
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          pInputText
+          type="text"
+          placeholder="Search tasks..."
+          (input)="onGlobalFilter(dt, $event)"
+        />
+      </p-iconfield>
+    </div>
+  </div>
+  
+  <!-- ✅ CHANGED: .card → .table-card -->
+  <div class="table-card">
+    <p-table
+      #dt
+      [value]="tasks"
+      [rows]="10"
+      [paginator]="true"
+      [loading]="isLoading"
+      [globalFilterFields]="['title', 'executiveName', 'executiveEmployeeId', 'status', 'priority']"
+      [tableStyle]="{ 'min-width': '75rem' }"
+      [scrollHeight]="'flex'"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} tasks"
+    >
+      <!-- ✅ REMOVED: Duplicate caption with search/title -->
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="title">
+            Task Title <p-sortIcon field="title" />
+          </th>
+          <th pSortableColumn="executiveName">
+            Assigned To <p-sortIcon field="executiveName" />
+          </th>
+          <th>Contact</th>
+          <th pSortableColumn="priority">
+            Priority <p-sortIcon field="priority" />
+          </th>
+          <th pSortableColumn="dueDate">
+            Due Date <p-sortIcon field="dueDate" />
+          </th>
+          <th pSortableColumn="completedAt">
+            Completed <p-sortIcon field="completedAt" />
+          </th>
+          <th pSortableColumn="status">
+            Status <p-sortIcon field="status" />
+          </th>
+          <th style="width: 10rem">Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-task>
+        <tr>
+          <!-- Task Title -->
+          <td>
+            <div class="task-title-cell">
+              <span class="task-name">{{ task.title }}</span>
+              <span class="task-description">
+                {{ task.description | slice:0:60 }}{{ task.description.length > 60 ? '...' : '' }}
+              </span>
+            </div>
+          </td>
+
+          <!-- Assigned To -->
+          <td>
+            <div class="assignee-cell">
+              <p-avatar
+                [label]="task.executiveName.substring(0, 2).toUpperCase()"
+                shape="circle"
+              />
+              <div class="assignee-info">
+                <span class="assignee-name">{{ task.executiveName }}</span>
+                <span class="assignee-id">{{ task.executiveEmployeeId }}</span>
+              </div>
+            </div>
+          </td>
+
+          <!-- Contact -->
+          <td>
+            <div class="contact-cell">
+              @if (task.executivePhone) {
+                <a [href]="'tel:' + task.executivePhone" class="text-primary">
+                  <i class="pi pi-phone"></i>
+                  {{ task.executivePhone }}
+                </a>
+              } @else {
+                <span>N/A</span>
+              }
+            </div>
+          </td>
+
+          <!-- Priority -->
+          <td>
+            <span class="priority-badge priority-{{ task.priority }}">
+              {{ task.priority.toUpperCase() }}
+            </span>
+          </td>
+
+          <!-- Due Date -->
+          <td>
+            <div class="due-date-cell" [class.overdue]="task.isOverdue">
+              {{ task.dueDate | date:'mediumDate' }}
+              @if (task.isOverdue) {
+                <div class="overdue-icon">
+                  <i class="pi pi-exclamation-triangle"></i> Overdue
+                </div>
+              }
+            </div>
+          </td>
+
+          <!-- Completed At -->
+          <td>
+            @if (task.completedAt) {
+              <span class="completed-time">{{ task.completedAt | date:'short' }}</span>
+            } @else {
+              <span class="text-muted">—</span>
+            }
+          </td>
+
+          <!-- Status -->
+          <td>
+            <p-tag
+              [value]="task.status.replace('_', ' ').toUpperCase()"
+              [severity]="getSeverity(task.status)"
+            />
+          </td>
+
+          <!-- Actions -->
+          <td>
+            <div class="action-buttons">
+              <button
+                pButton
+                icon="pi pi-check"
+                class="p-button-rounded p-button-sm approve-btn"
+                pTooltip="Approve"
+                tooltipPosition="top"
+                (click)="approveTask(task)"
+              ></button>
+              <button
+                pButton
+                icon="pi pi-times"
+                class="p-button-rounded p-button-sm reject-btn"
+                pTooltip="Reject"
+                tooltipPosition="top"
+                (click)="rejectTask(task)"
+              ></button>
+              <button
+                pButton
+                icon="pi pi-eye"
+                class="p-button-rounded p-button-sm view-btn"
+                pTooltip="View Details"
+                tooltipPosition="top"
+                (click)="viewTask(task)"
+              ></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Empty State -->
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8">
+            @if (isLoading) {
+              <div class="loading-state">
+                <i class="pi pi-spin pi-spinner"></i>
+                <p>Loading tasks...</p>
+              </div>
+            } @else {
+              <div class="empty-state">
+                <i class="pi pi-inbox"></i>
+                <h3>No tasks pending approval</h3>
+                <p>All caught up! Check back later.</p>
+              </div>
+            }
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+          <p-drawer
+            [(visible)]="showSideDrawer"
+            position="right"
+            modal="true"
+            [baseZIndex]="10000"
+            styleClass="task-detail-drawer"
+        >
+            <ng-container *ngIf="selectedTask">
+                <div class="drawer-header">
+                    <h3>{{ selectedTask.title }}</h3>
+                    <h3>{{ selectedTask | json }}</h3>
+                    <i class="pi pi-times" (click)="closeDrawer()"></i>
+                </div>
+
+                <div class="drawer-content">
+                    <p class="task-description">
+                        {{ selectedTask.description }}
+                    </p>
+
+                    <div class="task-meta">
+                        <p>
+                            <strong>Assigned To:</strong>
+                            {{ selectedTask.executiveName }}
+                        </p>
+                        <p>
+                            <strong>Ward ID:</strong> {{ selectedTask.wardId }}
+                        </p>
+                        <p>
+                            <strong>Due:</strong>
+                            {{ selectedTask.dueDate | date: 'mediumDate' }}
+                        </p>
+                        <p>
+                            <strong>Status:</strong>
+                            <p-tag
+                                [value]="selectedTask.status"
+                                [severity]="getSeverity(selectedTask.status)"
+                            ></p-tag>
+                        </p>
+                    </div>
+                </div>
+            </ng-container>
+        </p-drawer>
+  </div>
+
+  <p-toast></p-toast>
+</div>

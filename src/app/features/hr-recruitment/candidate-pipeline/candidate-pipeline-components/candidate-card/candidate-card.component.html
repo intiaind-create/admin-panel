@@ -1,0 +1,37 @@
+<div class="candidate-card" (click)="onCardClick()">
+  <!-- Header: avatar + name + email -->
+  <div class="candidate-card-header">
+    <div class="candidate-card-avatar">
+      {{ getInitials(card.candidateName) }}
+    </div>
+
+    <div class="candidate-card-main">
+      <div class="candidate-card-name">
+        {{ card.candidateName }}
+      </div>
+
+      <div class="candidate-card-email">
+        <i class="pi pi-envelope"></i>
+        <span>{{ card.email }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Meta row -->
+  <div class="candidate-card-meta">
+    <div class="meta-item">
+      <i class="pi pi-calendar"></i>
+      <span>Applied: {{ card.appliedDate | date : 'dd/MM/yyyy' }}</span>
+    </div>
+
+    <div class="meta-item" *ngIf="card.experience !== undefined">
+      <i class="pi pi-briefcase"></i>
+      <span>{{ card.experience }} yrs</span>
+    </div>
+
+    <div class="meta-item" *ngIf="card.phone">
+      <i class="pi pi-phone"></i>
+      <span>{{ card.phone }}</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,606 @@
+<div class="executive-form-container">
+    <p-card>
+        <ng-template pTemplate="header">
+            <div class="card-header">
+                <h2>Create Executive</h2>
+            </div>
+        </ng-template>
+
+        <form [formGroup]="executiveForm" (ngSubmit)="onSubmit()">
+            <!-- Profile Preview -->
+            <div class="profile-preview">
+                <div class="avatar-section">
+                    <p-avatar
+                        [label]="avatarInitials"
+                        size="xlarge"
+                        shape="circle"
+                    ></p-avatar>
+                </div>
+                <div class="info-section">
+                    <h3>{{ fullName }}</h3>
+                    <p>{{ jobTitle }}</p>
+                    <div class="meta-info">
+                        <span class="badge">{{
+                            executiveForm.get('employeeId')?.value
+                        }}</span>
+                        <span class="badge"
+                            >Joining:
+                            {{
+                                executiveForm.get('dateOfJoining')?.value
+                                    | date: 'mediumDate'
+                            }}</span
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <!-- Personal Details Section (No Tabs - Direct Display) -->
+            <div class="form-content">
+                <div class="form-section" formGroupName="personalDetails">
+                    <h3 class="section-title">
+                        <i class="pi pi-user"></i>
+                        Personal Details
+                    </h3>
+
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label for="firstName"
+                                >First Name
+                                <span class="required">*</span></label
+                            >
+                            <input
+                                id="firstName"
+                                type="text"
+                                pInputText
+                                formControlName="firstName"
+                                placeholder="Enter first name"
+                                [class.ng-invalid]="
+                                    isFieldInvalid('personalDetails.firstName')
+                                "
+                            />
+                            <small
+                                class="p-error"
+                                *ngIf="
+                                    isFieldInvalid('personalDetails.firstName')
+                                "
+                            >
+                                First name is required
+                            </small>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="lastName"
+                                >Last Name
+                                <span class="required">*</span></label
+                            >
+                            <input
+                                id="lastName"
+                                type="text"
+                                pInputText
+                                formControlName="lastName"
+                                placeholder="Enter last name"
+                                [class.ng-invalid]="
+                                    isFieldInvalid('personalDetails.lastName')
+                                "
+                            />
+                            <small
+                                class="p-error"
+                                *ngIf="
+                                    isFieldInvalid('personalDetails.lastName')
+                                "
+                            >
+                                Last name is required
+                            </small>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="workEmail"
+                                >Work Email
+                                <span class="required">*</span></label
+                            >
+                            <input
+                                id="workEmail"
+                                type="email"
+                                pInputText
+                                formControlName="workEmail"
+                                placeholder="executive@example.com"
+                                [class.ng-invalid]="
+                                    isFieldInvalid('personalDetails.workEmail')
+                                "
+                            />
+                            <small
+                                class="p-error"
+                                *ngIf="
+                                    isFieldInvalid('personalDetails.workEmail')
+                                "
+                            >
+                                Valid email is required
+                            </small>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="primaryPhone"
+                                >Phone Number
+                                <span class="required">*</span></label
+                            >
+                            <input
+                                id="primaryPhone"
+                                type="tel"
+                                pInputText
+                                formControlName="primaryPhone"
+                                placeholder="9876543210"
+                                [class.ng-invalid]="
+                                    isFieldInvalid(
+                                        'personalDetails.primaryPhone'
+                                    )
+                                "
+                            />
+                            <small
+                                class="p-error"
+                                *ngIf="
+                                    isFieldInvalid(
+                                        'personalDetails.primaryPhone'
+                                    )
+                                "
+                            >
+                                Valid 10-digit phone number is required
+                            </small>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="dateOfBirth">Date of Birth</label>
+                            <p-datepicker
+                                id="dateOfBirth"
+                                formControlName="dateOfBirth"
+                                [showIcon]="true"
+                                placeholder="Select date"
+                            ></p-datepicker>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="governmentId"
+                                >Government ID (Aadhaar/PAN)</label
+                            >
+                            <input
+                                id="governmentId"
+                                type="text"
+                                pInputText
+                                formControlName="governmentId"
+                                placeholder="Enter ID number"
+                            />
+                        </div>
+
+                        <div class="form-field full-width">
+                            <label for="currentAddress">Current Address</label>
+                            <textarea
+                                id="currentAddress"
+                                pInputTextarea
+                                formControlName="currentAddress"
+                                rows="3"
+                                placeholder="Enter current address"
+                            ></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employment & Hierarchy Section -->
+                <div class="form-section" formGroupName="employmentHierarchy">
+                    <h3 class="section-title">
+                        <i class="pi pi-briefcase"></i>
+                        Employment Details
+                    </h3>
+
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label for="jobTitle">Job Title</label>
+                            <input
+                                id="jobTitle"
+                                type="text"
+                                pInputText
+                                formControlName="jobTitle"
+                                placeholder="Field Executive"
+                            />
+                        </div>
+<div class="form-field">
+            <label for="positionType">
+                Position Type
+                <i 
+                    class="pi pi-info-circle ml-2" 
+                    pTooltip="Select 'Ward-based' for field executives, or choose a blanketed role for managers"
+                    tooltipPosition="right"
+                ></i>
+            </label>
+<p-select
+    inputId="positionType"
+    [options]="[
+        { label: 'Ward-based (Field Executive)', value: undefined },
+        { label: 'Subdistrict Manager (Blanketed)', value: 3 },
+        { label: 'District Manager (Blanketed)', value: 2 },
+        { label: 'Zone Manager (Blanketed)', value: 1 }
+    ]"
+    [ngModel]="executiveRoleLevel()"
+    (ngModelChange)="setExecutiveRoleLevel($event)"
+    placeholder="Select position type"
+    optionLabel="label"
+    optionValue="value"
+    [showClear]="true"
+></p-select>
+            <small class="p-help" *ngIf="!executiveRoleLevel()">
+                <i class="pi pi-check-circle text-success"></i> Ward-based: Select specific wards below
+            </small>
+            <small class="p-help" *ngIf="executiveRoleLevel()">
+                <i class="pi pi-building text-primary"></i> Blanketed: Manages entire {{ 
+                    executiveRoleLevel() === 3 ? 'subdistrict' : 
+                    executiveRoleLevel() === 2 ? 'district' : 
+                    'zone' 
+                }}
+            </small>
+        </div>
+                        <div class="form-field">
+                            <label for="department">Department</label>
+                            <p-select
+                                id="department"
+                                formControlName="department"
+                                [options]="departments"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Select Department"
+                                [showClear]="true"
+                            ></p-select>
+                        </div>
+
+                        <!-- ✅ CONTRACT TYPE FIELD -->
+                        <div class="form-field">
+                            <label for="contractType">Contract Type</label>
+                            <p-select
+                                id="contractType"
+                                formControlName="contractType"
+                                [options]="contractTypes"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Select Contract Type"
+                                [showClear]="true"
+                            ></p-select>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="hierarchyId">Hierarchy</label>
+                            <p-select
+                                id="hierarchyId"
+                                formControlName="hierarchyId"
+                                [options]="hierarchies"
+                                optionLabel="name"
+                                optionValue="_id"
+                                placeholder="Select Hierarchy (Optional)"
+                                [showClear]="true"
+                                (onChange)="onHierarchyChange($event)"
+                            ></p-select>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="reportingManagerId">
+                                Reporting Manager
+                                <span class="required">*</span>
+                            </label>
+                            <p-select
+                                id="reportingManagerId"
+                                formControlName="reportingManagerId"
+                                [options]="managers()"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Select Manager"
+                                [filter]="true"
+                                [disabled]="
+                                    isLoadingManagers() ||
+                                    !wardFiltersGroup.get('zone')?.value
+                                "
+                                [loading]="isLoadingManagers()"
+                                [class.ng-invalid]="
+                                    isFieldInvalid(
+                                        'employmentHierarchy.reportingManagerId'
+                                    )
+                                "
+                            ></p-select>
+                            <small class="p-help" *ngIf="isLoadingManagers()">
+                                <i class="pi pi-spin pi-spinner"></i> Loading
+                                managers...
+                            </small>
+                            <small
+                                class="p-help"
+                                *ngIf="
+                                    !isLoadingManagers() &&
+                                    managers().length === 0 &&
+                                    wardFiltersGroup.get('zone')?.value
+                                "
+                            >
+                                <i
+                                    class="pi pi-exclamation-triangle text-warning"
+                                ></i>
+                                No managers found for selected geography
+                            </small>
+                            <small
+                                class="p-help"
+                                *ngIf="
+                                    !isLoadingManagers() &&
+                                    managers().length > 0
+                                "
+                            >
+                                <i class="pi pi-check-circle text-success"></i>
+                                {{ managers().length }} manager(s) available
+                            </small>
+                            <small
+                                class="p-error"
+                                *ngIf="
+                                    isFieldInvalid(
+                                        'employmentHierarchy.reportingManagerId'
+                                    )
+                                "
+                            >
+                                Manager is required
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Ward Assignment Section -->
+                    <h3 class="section-title">
+                        <i class="pi pi-map-marker"></i>
+                        Ward Assignment
+                    </h3>
+
+                    <div formGroupName="wardFilters">
+                        <div class="form-grid">
+                            <div class="form-field">
+                                <label for="zone"
+                                    >Zone <span class="required">*</span></label
+                                >
+                                <p-select
+                                    id="zone"
+                                    formControlName="zone"
+                                    [options]="zones()"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    placeholder="Select Zone"
+                                    [filter]="true"
+                                    [showClear]="true"
+                                    (onChange)="onZoneChange($event)"
+                                ></p-select>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="district"
+                                    >District
+                                    <span class="required">*</span></label
+                                >
+                                <p-select
+                                    id="district"
+                                    formControlName="district"
+                                    [options]="districts()"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    placeholder="Select District"
+                                    [filter]="true"
+                                    [showClear]="true"
+                                    [disabled]="
+                                        !wardFiltersGroup.get('zone')?.value
+                                    "
+                                    [loading]="loadingDistricts()"
+                                    (onChange)="onDistrictChange($event)"
+                                ></p-select>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="subdistrict"
+                                    >Subdistrict
+                                    <span class="required">*</span></label
+                                >
+                                <p-select
+                                    id="subdistrict"
+                                    formControlName="subdistrict"
+                                    [options]="subdistricts()"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    placeholder="Select Subdistrict"
+                                    [filter]="true"
+                                    [showClear]="true"
+                                    [disabled]="
+                                        !wardFiltersGroup.get('district')?.value
+                                    "
+                                    [loading]="loadingSubdistricts()"
+                                    (onChange)="onSubdistrictChange($event)"
+                                ></p-select>
+                            </div>
+
+                            <div class="form-field">
+                                <label for="localBody"
+                                    >Local Body
+                                    <span class="required">*</span></label
+                                >
+                                <p-select
+                                    id="localBody"
+                                    formControlName="localBody"
+                                    [options]="localBodies()"
+                                    optionLabel="label"
+                                    optionValue="value"
+                                    placeholder="Select Local Body"
+                                    [filter]="true"
+                                    [showClear]="true"
+                                    [disabled]="
+                                        !wardFiltersGroup.get('subdistrict')
+                                            ?.value
+                                    "
+                                    [loading]="loadingLocalBodies()"
+                                    (onChange)="onLocalBodyChange($event)"
+                                ></p-select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ward Selection -->
+                    <!-- Ward Selection - Only for ward-based positions -->
+<div class="form-field full-width" *ngIf="!executiveRoleLevel()">
+    <label for="wardIds">
+        Assigned Wards
+        <span class="required">*</span>
+    </label>
+    <p-multiselect
+        id="wardIds"
+        formControlName="wardIds"
+        [options]="availableWards()"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select Wards"
+        [filter]="true"
+        [disabled]="availableWards().length === 0"
+        [loading]="loadingWards()"
+        display="chip"
+        (onChange)="onWardsChange($event)"
+        [class.ng-invalid]="isFieldInvalid('employmentHierarchy.wardIds')"
+    ></p-multiselect>
+    <small class="p-error" *ngIf="isFieldInvalid('employmentHierarchy.wardIds')">
+        At least one ward is required
+    </small>
+    <small class="p-help" *ngIf="availableWards().length === 0 && !loadingWards()">
+        Please select a local body to load wards
+    </small>
+</div>
+
+<!-- Blanketed Position Info -->
+<div class="form-field full-width" *ngIf="executiveRoleLevel()">
+    <div class="p-3 bg-primary-50 border-round">
+        <div class="flex align-items-center gap-2">
+            <i class="pi pi-building text-primary text-xl"></i>
+            <div>
+                <strong>Blanketed Position</strong>
+                <p class="m-0 mt-1 text-sm">
+                    This position manages the entire {{ 
+                        executiveRoleLevel() === 3 ? 'subdistrict' : 
+                        executiveRoleLevel() === 2 ? 'district' : 
+                        'zone' 
+                    }}. No specific ward assignment required.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+                </div>
+
+                <!-- Area of Operation Section -->
+                <div class="form-section" formGroupName="areaOfOperation">
+                    <h3 class="section-title">
+                        <i class="pi pi-globe"></i>
+                        Area of Operation
+                    </h3>
+
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label for="region">Region</label>
+                            <p-select
+                                id="region"
+                                formControlName="region"
+                                [options]="regions"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Select Region"
+                                [showClear]="true"
+                            ></p-select>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="primaryTerritory"
+                                >Primary Territory</label
+                            >
+                            <input
+                                id="primaryTerritory"
+                                type="text"
+                                pInputText
+                                formControlName="primaryTerritory"
+                                placeholder="Enter primary territory"
+                            />
+                        </div>
+
+                        <div class="form-field full-width">
+                            <label for="assignedZones">Assigned Zones</label>
+                            <p-multiselect
+                                id="assignedZones"
+                                formControlName="assignedZones"
+                                [options]="zones()"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Select Zones"
+                                [filter]="true"
+                                display="chip"
+                            ></p-multiselect>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Debug Section -->
+                <div class="debug-section">
+                    <h4>Form Debug Info:</h4>
+                    <p>Form Valid: {{ executiveForm.valid }}</p>
+                    <p>Form Invalid: {{ executiveForm.invalid }}</p>
+
+                    <div *ngIf="executiveForm.invalid">
+                        <h5>Invalid Controls:</h5>
+                        <ul>
+                            <li
+                                *ngIf="
+                                    executiveForm.get('employmentHierarchy')
+                                        ?.invalid
+                                "
+                            >
+                                Employment & Hierarchy Invalid
+                                <ul>
+                                    <li
+                                        *ngIf="
+                                            executiveForm.get(
+                                                'employmentHierarchy.reportingManagerId'
+                                            )?.invalid
+                                        "
+                                    >
+                                        Manager: Required
+                                    </li>
+                                    <li
+                                        *ngIf="
+                                            executiveForm.get(
+                                                'employmentHierarchy.wardIds'
+                                            )?.invalid
+                                        "
+                                    >
+                                        Ward IDs:
+                                        {{
+                                            executiveForm.get(
+                                                'employmentHierarchy.wardIds'
+                                            )?.value?.length || 0
+                                        }}
+                                        selected
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <p-button
+                    label="Cancel"
+                    icon="pi pi-times"
+                    severity="secondary"
+                    [outlined]="true"
+                    (onClick)="onCancel()"
+                    type="button"
+                ></p-button>
+
+                <p-button
+                    label="Create Executive"
+                    icon="pi pi-check"
+                    type="submit"
+                    [loading]="submitting"
+                    [disabled]="executiveForm.invalid || submitting"
+                ></p-button>
+            </div>
+        </form>
+    </p-card>
+</div>

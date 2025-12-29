@@ -1,0 +1,486 @@
+// ============================================
+// TASK LIST - ENTERPRISE DESIGN
+// ============================================
+
+// Color System
+$primary-blue: #1e40af;
+$primary-blue-light: #3b82f6;
+$success-green: #10b981;
+$success-light: #d1fae5;
+$warning-orange: #f59e0b;
+$warning-light: #fef3c7;
+$danger-red: #ef4444;
+$danger-light: #fee2e2;
+$info-blue: #3b82f6;
+$info-light: #dbeafe;
+$neutral-50: #f9fafb;
+$neutral-100: #f3f4f6;
+$neutral-200: #e5e7eb;
+$neutral-300: #d1d5db;
+$neutral-500: #6b7280;
+$neutral-700: #374151;
+$neutral-900: #111827;
+
+// ============================================
+// PAGE CONTAINER
+// ============================================
+.task-list-container {
+  padding: 2rem;
+  background: $neutral-50;
+  min-height: 100vh;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+// ============================================
+// HEADER SECTION
+// ============================================
+.page-header {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid $neutral-200;
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  .title-section {
+    flex: 1;
+
+    .page-title {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 0 0 0.5rem 0;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: $neutral-900;
+
+      i {
+        font-size: 2rem;
+        background: linear-gradient(135deg, $primary-blue-light, $primary-blue);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+    }
+
+    .page-subtitle {
+      margin: 0;
+      color: $neutral-500;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+  }
+
+  .create-btn {
+    background: linear-gradient(135deg, $primary-blue-light, $primary-blue);
+    border: none;
+    box-shadow: 0 2px 8px rgba(30, 64, 175, 0.25);
+    transition: all 0.3s ease;
+    font-weight: 600;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.35);
+    }
+  }
+}
+
+// ============================================
+// SEARCH & FILTERS
+// ============================================
+.filters-section {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid $neutral-200;
+
+  .search-wrapper {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
+
+    ::ng-deep {
+      .p-iconfield {
+        flex: 1;
+
+        .p-inputtext {
+          width: 100%;
+          border-radius: 8px;
+          border: 1px solid $neutral-300;
+          padding: 0.75rem 1rem 0.75rem 2.5rem;
+          font-size: 0.95rem;
+          transition: all 0.2s ease;
+
+          &:focus {
+            border-color: $primary-blue;
+            box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+          }
+        }
+
+        .p-inputicon {
+          color: $neutral-500;
+          left: 0.75rem;
+        }
+      }
+    }
+  }
+}
+
+// ============================================
+// TABLE CARD
+// ============================================
+.table-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid $neutral-200;
+
+  ::ng-deep {
+    // Table Header
+    .p-datatable-thead > tr > th {
+      background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+      color: $neutral-700;
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 1rem;
+      border-bottom: 2px solid $neutral-200;
+
+      &:hover {
+        background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
+      }
+    }
+
+    // Table Body
+    .p-datatable-tbody > tr {
+      transition: all 0.2s ease;
+      border-bottom: 1px solid $neutral-100;
+
+      &:hover {
+        background: linear-gradient(90deg, rgba(30, 64, 175, 0.02) 0%, rgba(30, 64, 175, 0.05) 100%);
+        transform: translateX(2px);
+      }
+
+      > td {
+        padding: 1rem;
+        color: $neutral-700;
+        font-size: 0.95rem;
+        vertical-align: middle;
+      }
+    }
+
+    // Remove default PrimeNG striping
+    .p-datatable-striped .p-datatable-tbody > tr:nth-child(even) {
+      background: transparent;
+    }
+  }
+}
+
+// ============================================
+// TASK TITLE CELL
+// ============================================
+.task-title-cell {
+  .task-name {
+    font-weight: 600;
+    color: $neutral-900;
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+  }
+
+  .task-description {
+    font-size: 0.85rem;
+    color: $neutral-500;
+    font-style: italic;
+    display: block;
+    margin-top: 0.25rem;
+  }
+}
+
+// ============================================
+// ASSIGNEE CELL
+// ============================================
+.assignee-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  ::ng-deep .p-avatar {
+    background: linear-gradient(135deg, $primary-blue-light, $primary-blue);
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 6px rgba(30, 64, 175, 0.2);
+  }
+
+  .assignee-info {
+    display: flex;
+    flex-direction: column;
+
+    .assignee-name {
+      font-weight: 600;
+      color: $neutral-900;
+      font-size: 0.95rem;
+    }
+
+    .assignee-id {
+      font-size: 0.8rem;
+      color: $neutral-500;
+      font-family: 'Courier New', monospace;
+    }
+  }
+}
+
+// ============================================
+// PRIORITY BADGES (Muted, less repetitive)
+// ============================================
+.priority-badge {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+
+  &.priority-urgent {
+    background: $danger-light;
+    color: $danger-red;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+
+  &.priority-high {
+    background: $warning-light;
+    color: $warning-orange;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  &.priority-medium {
+    background: $info-light;
+    color: $info-blue;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+  }
+
+  &.priority-low {
+    background: $success-light;
+    color: $success-green;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+}
+
+// ============================================
+// DUE DATE CELL (Smart colors)
+// ============================================
+.due-date-cell {
+  font-weight: 500;
+  font-size: 0.9rem;
+
+  &.overdue {
+    color: $danger-red;
+    font-weight: 600;
+    
+    .overdue-icon {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.25rem 0.5rem;
+      background: $danger-light;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      margin-top: 0.25rem;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+
+      i {
+        font-size: 0.75rem;
+      }
+    }
+  }
+
+  &.upcoming {
+    color: $warning-orange;
+    font-weight: 500;
+  }
+
+  &.normal {
+    color: $neutral-700;
+  }
+}
+
+// ============================================
+// STATUS TAGS (Softer, refined)
+// ============================================
+::ng-deep .p-tag {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+
+  &.p-tag-success {
+    background: $success-light;
+    color: $success-green;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+
+  &.p-tag-info {
+    background: $info-light;
+    color: $info-blue;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+  }
+
+  &.p-tag-warn,
+  &.p-tag-warning {
+    background: $warning-light;
+    color: $warning-orange;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  &.p-tag-danger {
+    background: $danger-light;
+    color: $danger-red;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+}
+
+// ============================================
+// ACTION MENU (Three-dot button)
+// ============================================
+.action-menu-btn {
+  ::ng-deep .p-button {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: transparent;
+    color: $neutral-500;
+    border: 1px solid $neutral-300;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $neutral-100;
+      color: $neutral-700;
+      transform: translateY(-2px);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+    }
+  }
+}
+
+// ============================================
+// CONTACT COLUMN (if exists)
+// ============================================
+.contact-cell {
+  color: $neutral-500;
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+// ============================================
+// EMPTY STATE
+// ============================================
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: $neutral-500;
+
+  i {
+    font-size: 4rem;
+    color: $neutral-300;
+    margin-bottom: 1rem;
+  }
+
+  h3 {
+    color: $neutral-700;
+    font-size: 1.25rem;
+    margin: 1rem 0 0.5rem 0;
+  }
+
+  p {
+    color: $neutral-500;
+    margin: 0;
+  }
+}
+
+// ============================================
+// LOADING STATE
+// ============================================
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  margin-top: 2rem;
+
+  i {
+    font-size: 3rem;
+    color: $primary-blue;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: $neutral-500;
+    font-size: 1rem;
+  }
+}
+
+// ============================================
+// RESPONSIVE DESIGN
+// ============================================
+@media (max-width: 992px) {
+  .table-card ::ng-deep {
+    .p-datatable-thead > tr > th,
+    .p-datatable-tbody > tr > td {
+      padding: 0.75rem;
+      font-size: 0.85rem;
+    }
+  }
+
+  .assignee-cell {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    padding: 1.5rem;
+
+    .title-section .page-title {
+      font-size: 1.5rem;
+    }
+  }
+
+  .filters-section {
+    padding: 1rem;
+  }
+}

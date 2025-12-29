@@ -1,0 +1,757 @@
+<div class="content-management-wrapper">
+    <p-toast position="top-right" />
+    <!-- Header -->
+    <div class="content-header shadow-2 border-round-lg mb-4">
+        <div class="flex align-items-center justify-content-between px-5 py-4">
+            <div class="flex align-items-center gap-4">
+                <i class="pi pi-book text-white text-2xl"></i>
+
+                <div>
+                    <h1 class="text-3xl font-bold text-900 m-0 mb-2">
+                        Content Management
+                    </h1>
+                    <p class="text-600 m-0">
+                        Training &amp; Course Administration
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex align-items-center gap-4">
+                <div class="text-center px-4 border-right-1 surface-border">
+                    <div class="text-2xl font-bold text-primary">
+                        {{ courseTree().length }}
+                    </div>
+                    <div class="text-sm text-500 uppercase font-medium">
+                        Courses
+                    </div>
+                </div>
+                <div class="text-center px-4 border-right-1 surface-border">
+                    <div class="text-2xl font-bold text-primary">
+                        {{ getTotalModules() }}
+                    </div>
+                    <div class="text-sm text-500 uppercase font-medium">
+                        Modules
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <p-button
+                        icon="pi pi-refresh"
+                        [outlined]="true"
+                        [loading]="loading()"
+                        (click)="loadCourses()"
+                        pTooltip="Refresh"
+                        tooltipPosition="bottom"
+                    />
+                    <p-button
+                        label="New Course"
+                        icon="pi pi-plus"
+                        (click)="showNewCourseDialog = true"
+                    />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <!-- LEFT: Course Tree -->
+        <div class="col-12 lg:col-3">
+            <div class="surface-card shadow-2 border-round-lg h-full">
+                <div
+                    class="flex align-items-center justify-content-between p-4 border-bottom-1 surface-border"
+                >
+                    <div class="flex align-items-center gap-2">
+                        <i class="pi pi-list text-primary"></i>
+                        <span class="font-semibold text-900"
+                            >Course Library</span
+                        >
+                    </div>
+                    <p-tag [value]="courseTree().length.toString()" />
+                </div>
+
+                <div class="p-3 border-bottom-1 surface-border">
+                    <span class="p-input-icon-left w-full">
+                        <i class="pi pi-search"></i>
+                        <input
+                            pInputText
+                            type="text"
+                            placeholder="Search courses..."
+                            class="w-full"
+                        />
+                    </span>
+                </div>
+
+                <div
+                    class="p-3"
+                    style="max-height: calc(100vh - 350px); overflow-y: auto"
+                >
+                    @if (loading()) {
+                        <div
+                            class="flex flex-column align-items-center justify-content-center py-8"
+                        >
+                            <p-progressSpinner
+                                styleClass="w-4rem h-4rem"
+                                strokeWidth="4"
+                            />
+                            <p class="text-sm text-600 mt-3">
+                                Loading courses...
+                            </p>
+                        </div>
+                    } @else if (courseTree().length === 0) {
+                        <div
+                            class="flex flex-column align-items-center justify-content-center py-8 text-center"
+                        >
+                            <i class="pi pi-inbox text-6xl text-300 mb-4"></i>
+                            <h3 class="text-lg font-semibold text-900 mb-2">
+                                No Courses
+                            </h3>
+                            <p class="text-sm text-600 mb-4">
+                                Create your first course to get started.
+                            </p>
+                            <p-button
+                                label="Create Course"
+                                icon="pi pi-plus"
+                                size="small"
+                                (click)="showNewCourseDialog = true"
+                            />
+                        </div>
+                    } @else {
+                        <p-tree
+                            [value]="courseTree()"
+                            selectionMode="single"
+                            [(selection)]="selectedNode"
+                            (onNodeSelect)="onNodeSelect($event)"
+                            [filter]="true"
+                            filterPlaceholder="Filter..."
+                            class="w-full"
+                        />
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- CENTER: Editor -->
+        <div class="col-12 lg:col-6">
+            <div class="surface-card shadow-2 border-round-lg">
+                @if (!selectedNode) {
+                    <div
+                        class="flex flex-column align-items-center justify-content-center p-8"
+                        style="min-height: 500px"
+                    >
+                        <div class="text-center" style="max-width: 400px">
+                            <i
+                                class="pi pi-file-edit text-5xl text-primary"
+                            ></i>
+
+                            <h2 class="text-2xl font-bold text-900 mb-3">
+                                Select Content to Edit
+                            </h2>
+                            <p class="text-600 line-height-3 mb-4">
+                                Choose a course or module from the library to
+                                view and manage its details.
+                            </p>
+                            <div class="flex gap-2 justify-content-center">
+                                <p-button
+                                    label="Refresh"
+                                    icon="pi pi-refresh"
+                                    [outlined]="true"
+                                    (click)="loadCourses()"
+                                />
+                                <p-button
+                                    label="New Course"
+                                    icon="pi pi-plus"
+                                    (click)="showNewCourseDialog = true"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                } @else {
+                    <div class="p-5">
+                        <!-- Breadcrumb -->
+                        <div class="flex align-items-center gap-2 mb-4 text-sm">
+                            <i class="pi pi-home text-500"></i>
+                            <i class="pi pi-angle-right text-400"></i>
+                            <span class="text-600">Content Library</span>
+                            <i class="pi pi-angle-right text-400"></i>
+                            <span class="font-semibold text-900">
+                                {{ selectedContentTitle || 'Untitled' }}
+                            </span>
+                        </div>
+
+                        <!-- Title & Tags -->
+                        <div class="flex align-items-center gap-2 mb-3">
+                            <p-tag
+                                [value]="
+                                    selectedContentType || 'course' | titlecase
+                                "
+                                [severity]="
+                                    getContentTypeColor(
+                                        selectedContentType || 'course'
+                                    )
+                                "
+                            />
+                            @if (isCourse()) {
+                                <p-tag value="Course" severity="success" />
+                            } @else {
+                                <p-tag value="Module" severity="secondary" />
+                            }
+                        </div>
+
+                        <!-- Title -->
+                        <div class="mb-4">
+                            <label
+                                class="block text-sm font-semibold text-700 mb-2"
+                                >Title *</label
+                            >
+                            <input
+                                pInputText
+                                [(ngModel)]="selectedContentTitle"
+                                placeholder="Enter title"
+                                class="w-full text-xl font-bold"
+                            />
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-4">
+                            <label
+                                class="block text-sm font-semibold text-700 mb-2"
+                                >Description</label
+                            >
+                            <textarea
+                                pInputTextarea
+                                [(ngModel)]="selectedContentDescription"
+                                rows="4"
+                                placeholder="Enter description..."
+                                class="w-full"
+                            ></textarea>
+                        </div>
+
+                        <!-- Course fields -->
+                        @if (isCourse()) {
+                            <div class="grid mb-4">
+                                <div class="col-12 md:col-6">
+                                    <label
+                                        class="block text-sm font-semibold text-700 mb-2"
+                                        >Category *</label
+                                    >
+                                    <p-select
+                                        [options]="categories"
+                                        [(ngModel)]="selectedContentCategory"
+                                        placeholder="Select category"
+                                        class="w-full"
+                                        [filter]="true"
+                                    />
+                                </div>
+                                <div class="col-12 md:col-6">
+                                    <label
+                                        class="block text-sm font-semibold text-700 mb-2"
+                                        >Passing Score (%)</label
+                                    >
+                                    <p-inputNumber
+                                        [(ngModel)]="
+                                            selectedNode!.data.passingScore
+                                        "
+                                        [min]="0"
+                                        [max]="100"
+                                        suffix="%"
+                                        class="w-full"
+                                    />
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Module fields -->
+                        @if (isModule()) {
+                            <div class="grid mb-4">
+                                <div class="col-12 md:col-6">
+                                    <label
+                                        class="block text-sm font-semibold text-700 mb-2"
+                                        >Content Type</label
+                                    >
+                                    <p-select
+                                        [options]="contentTypes"
+                                        [(ngModel)]="selectedContentType"
+                                        placeholder="Select type"
+                                        class="w-full"
+                                    />
+                                </div>
+                                <div class="col-12 md:col-6">
+                                    <label
+                                        class="block text-sm font-semibold text-700 mb-2"
+                                        >Estimated Minutes</label
+                                    >
+                                    <p-inputNumber
+                                        [(ngModel)]="
+                                            selectedNode!.data.estimatedMinutes
+                                        "
+                                        [min]="0"
+                                        suffix=" min"
+                                        class="w-full"
+                                    />
+                                </div>
+                            </div>
+
+                            <!-- Module content upload -->
+                            <div class="mb-4 surface-50 border-round p-3">
+                                <div
+                                    class="flex align-items-center justify-content-between mb-2"
+                                >
+                                    <span class="font-semibold text-900"
+                                        >Module Content File</span
+                                    >
+                                    <span
+                                        class="text-400 text-sm"
+                                        *ngIf="selectedModuleContentUrl"
+                                    >
+                                        {{ selectedContentType | titlecase }}
+                                        attached
+                                    </span>
+                                </div>
+
+                                <p-fileUpload
+                                    name="moduleContent"
+                                    mode="basic"
+                                    chooseLabel="Upload file"
+                                    [auto]="true"
+                                    [maxFileSize]="524288000"
+                                    (onSelect)="onModuleFileSelected($event)"
+                                    [disabled]="uploading()"
+                                ></p-fileUpload>
+
+                                <small class="text-500 block mt-2">
+                                    Video: MP4/WebM/OGG/MOV up to 500MB.
+                                    Documents: PDF/DOC/DOCX up to 50MB.
+                                </small>
+                            </div>
+
+                            <!-- Module content preview -->
+                            @if (selectedModuleContentUrl) {
+                                <div class="mb-4 surface-card border-round p-3">
+                                    <h3
+                                        class="text-sm font-semibold text-700 mb-3"
+                                    >
+                                        Content Preview
+                                    </h3>
+
+                                    @if (selectedContentType === 'video') {
+                                        <video
+                                            controls
+                                            [src]="selectedModuleContentUrl"
+                                            class="w-full border-round"
+                                            style="max-height: 360px"
+                                        ></video>
+                                    } @else if (
+                                        selectedContentType === 'document'
+                                    ) {
+                                        <iframe
+                                            [src]="
+                                                selectedModuleContentUrl
+                                                    | safeResource
+                                            "
+                                            class="w-full border-round"
+                                            style="height: 480px; border: none"
+                                        ></iframe>
+                                    } @else {
+                                        <p class="text-600 text-sm m-0">
+                                            This content type does not have a
+                                            preview. Use the dedicated editor
+                                            instead.
+                                        </p>
+                                    }
+                                </div>
+                            } @else {
+                                <div
+                                    class="mb-4 surface-50 border-round p-3 text-sm text-600"
+                                >
+                                    No content file uploaded yet. Upload a video
+                                    or document to attach it to this module.
+                                </div>
+                            }
+                        }
+
+                        <p-divider />
+
+                        <!-- Modules list for courses -->
+                        @if (isCourse()) {
+                            <div class="mb-4">
+                                <div
+                                    class="flex align-items-center justify-content-between mb-3"
+                                >
+                                    <h3 class="text-lg font-bold text-900 m-0">
+                                        Modules ({{
+                                            selectedNode!.data.modules
+                                                ?.length || 0
+                                        }})
+                                    </h3>
+                                    <p-button
+                                        label="Add Module"
+                                        icon="pi pi-plus"
+                                        size="small"
+                                        [outlined]="true"
+                                        (click)="openAddModuleDialog()"
+                                    />
+                                </div>
+
+                                @if (
+                                    selectedNode!.data.modules &&
+                                    selectedNode!.data.modules.length > 0
+                                ) {
+                                    <div class="flex flex-column gap-2">
+                                        @for (
+                                            module of selectedNode!.data
+                                                .modules;
+                                            track module._id;
+                                            let i = $index
+                                        ) {
+                                            <div
+                                                class="surface-50 border-round p-3 flex align-items-center justify-content-between hover:surface-100 transition-duration-150 cursor-pointer"
+                                            >
+                                                <div
+                                                    class="flex align-items-center gap-3"
+                                                >
+                                                    <div
+                                                        class="bg-primary text-white w-2rem h-2rem border-circle flex align-items-center justify-content-center font-bold text-sm"
+                                                    >
+                                                        {{ i + 1 }}
+                                                    </div>
+                                                    <div>
+                                                        <div
+                                                            class="font-semibold text-900"
+                                                        >
+                                                            {{ module.title }}
+                                                        </div>
+                                                        <div
+                                                            class="text-sm text-600"
+                                                        >
+                                                            {{
+                                                                module.contentType ||
+                                                                    'No type'
+                                                            }}
+                                                            <span
+                                                                *ngIf="
+                                                                    module.contentId
+                                                                "
+                                                                class="ml-2 text-xs text-primary"
+                                                            >
+                                                                • file attached
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="flex gap-2">
+                                                    <p-button
+                                                        icon="pi pi-pencil"
+                                                        size="small"
+                                                        [text]="true"
+                                                        [rounded]="true"
+                                                        label="Edit"
+                                                        (click)="
+                                                            selectModuleFromList(
+                                                                module
+                                                            )
+                                                        "
+                                                    />
+                                                    <p-button
+                                                        icon="pi pi-trash"
+                                                        severity="danger"
+                                                        size="small"
+                                                        [text]="true"
+                                                        [rounded]="true"
+                                                        label="Delete"
+                                                        (click)="
+                                                            onDeleteModule(
+                                                                module
+                                                            )
+                                                        "
+                                                    />
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                } @else {
+                                    <div
+                                        class="surface-50 border-round p-4 text-center"
+                                    >
+                                        <i
+                                            class="pi pi-folder-open text-4xl text-300 mb-3"
+                                        ></i>
+                                        <p class="text-600 m-0">
+                                            No modules yet. Click "Add Module"
+                                            to create one.
+                                        </p>
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <!-- Actions -->
+                        <div
+                            class="flex gap-2 justify-content-end pt-4 border-top-1 surface-border"
+                        >
+                            <p-button
+                                label="Discard"
+                                icon="pi pi-times"
+                                severity="secondary"
+                                [outlined]="true"
+                            />
+                            <p-button
+                                label="Save Changes"
+                                icon="pi pi-check"
+                                [loading]="saving()"
+                                (click)="saveContent()"
+                            />
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- RIGHT: Properties -->
+        <div class="col-12 lg:col-3">
+            <div class="surface-card shadow-2 border-round-lg p-4 h-full">
+                <h3
+                    class="text-lg font-bold text-900 mb-4 flex align-items-center gap-2"
+                >
+                    <i class="pi pi-cog text-primary"></i>
+                    Properties
+                </h3>
+
+                @if (selectedNode) {
+                    <div class="flex flex-column gap-4">
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-700 mb-2"
+                                >Status</label
+                            >
+                            <p-tag
+                                value="Published"
+                                severity="success"
+                                class="w-full"
+                            />
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-700 mb-2"
+                                >Created</label
+                            >
+                            <p class="text-sm text-600 m-0">
+                                <i class="pi pi-calendar mr-2"></i>
+                                {{
+                                    selectedNode.data?.createdAt
+                                        | date: 'MMM d, y'
+                                }}
+                            </p>
+                        </div>
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-700 mb-2"
+                                >Last Modified</label
+                            >
+                            <p class="text-sm text-600 m-0">
+                                <i class="pi pi-clock mr-2"></i>
+                                {{
+                                    selectedNode.data?.updatedAt
+                                        | date: 'MMM d, y, h:mm a'
+                                }}
+                            </p>
+                        </div>
+                    </div>
+                } @else {
+                    <div class="text-center py-6">
+                        <i class="pi pi-info-circle text-4xl text-300 mb-3"></i>
+                        <p class="text-sm text-500">
+                            Select content to view properties.
+                        </p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Module Dialog -->
+    <p-dialog
+        header="Add Module"
+        [(visible)]="showAddModuleDialog"
+        [modal]="true"
+        [style]="{ width: '500px' }"
+        [draggable]="false"
+    >
+        <div class="flex flex-column gap-3">
+            <div>
+                <label class="block text-sm font-semibold text-700 mb-2"
+                    >Title *</label
+                >
+                <input
+                    pInputText
+                    [(ngModel)]="newModule.title"
+                    placeholder="Module title"
+                    class="w-full"
+                />
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-700 mb-2"
+                    >Description</label
+                >
+                <textarea
+                    pInputTextarea
+                    rows="3"
+                    [(ngModel)]="newModule.description"
+                    placeholder="Short description"
+                    class="w-full"
+                ></textarea>
+            </div>
+            <div class="grid">
+                <div class="col-12 md:col-6">
+                    <label class="block text-sm font-semibold text-700 mb-2"
+                        >Estimated Minutes</label
+                    >
+                    <p-inputNumber
+                        [(ngModel)]="newModule.estimatedMinutes"
+                        [min]="0"
+                        suffix=" min"
+                        class="w-full"
+                    ></p-inputNumber>
+                </div>
+                <div class="col-12 md:col-6">
+                    <label class="block text-sm font-semibold text-700 mb-2"
+                        >Content Type</label
+                    >
+                    <p-select
+                        [options]="contentTypes"
+                        [(ngModel)]="newModule.contentType"
+                        class="w-full"
+                        placeholder="Select type"
+                    ></p-select>
+                </div>
+            </div>
+            <div>
+                <p-checkbox
+                    binary="true"
+                    [(ngModel)]="newModule.isRequired"
+                    label="Required module"
+                ></p-checkbox>
+            </div>
+        </div>
+
+        <ng-template pTemplate="footer">
+            <p-button
+                label="Cancel"
+                [outlined]="true"
+                (click)="showAddModuleDialog = false"
+            ></p-button>
+            <p-button
+                label="Create"
+                icon="pi pi-check"
+                [loading]="saving()"
+                (click)="createModuleFromDialog()"
+            ></p-button>
+        </ng-template>
+    </p-dialog>
+
+    <!-- New Course Dialog -->
+    <p-dialog
+        header="Create New Course"
+        [(visible)]="showNewCourseDialog"
+        [modal]="true"
+        [style]="{ width: '600px' }"
+        [draggable]="false"
+    >
+        <div class="flex flex-column gap-3">
+            <div>
+                <label class="block text-sm font-semibold text-700 mb-2"
+                    >Course Title *</label
+                >
+                <input
+                    pInputText
+                    [(ngModel)]="newCourse.title"
+                    placeholder="Enter course title"
+                    class="w-full"
+                />
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-700 mb-2"
+                    >Description</label
+                >
+                <textarea
+                    pInputTextarea
+                    rows="4"
+                    [(ngModel)]="newCourse.description"
+                    placeholder="Brief description of the course"
+                    class="w-full"
+                ></textarea>
+            </div>
+
+            <div class="grid">
+                <div class="col-12 md:col-6">
+                    <label class="block text-sm font-semibold text-700 mb-2"
+                        >Category *</label
+                    >
+                    <p-select
+                        [options]="categories"
+                        [(ngModel)]="newCourse.category"
+                        placeholder="Select category"
+                        class="w-full"
+                        [filter]="true"
+                    />
+                </div>
+
+                <div class="col-12 md:col-6">
+                    <label class="block text-sm font-semibold text-700 mb-2"
+                        >Difficulty *</label
+                    >
+                    <p-select
+                        [options]="difficultyOptions"
+                        [(ngModel)]="newCourse.difficulty"
+                        placeholder="Select difficulty"
+                        class="w-full"
+                    />
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="col-12 md:col-6">
+                    <label class="block text-sm font-semibold text-700 mb-2"
+                        >Estimated Hours</label
+                    >
+                    <p-inputNumber
+                        [(ngModel)]="newCourse.estimatedHours"
+                        [min]="0"
+                        [step]="0.5"
+                        suffix=" hrs"
+                        placeholder="e.g., 2.5"
+                        class="w-full"
+                    />
+                </div>
+
+                <div class="col-12 md:col-6">
+                    <label class="block text-sm font-semibold text-700 mb-2"
+                        >Passing Score (%)</label
+                    >
+                    <p-inputNumber
+                        [(ngModel)]="newCourse.passingScore"
+                        [min]="0"
+                        [max]="100"
+                        suffix="%"
+                        placeholder="e.g., 70"
+                        class="w-full"
+                    />
+                </div>
+            </div>
+        </div>
+
+        <ng-template pTemplate="footer">
+            <p-button
+                label="Cancel"
+                severity="secondary"
+                [outlined]="true"
+                (click)="showNewCourseDialog = false"
+            />
+            <p-button
+                label="Create Course"
+                icon="pi pi-check"
+                [loading]="saving()"
+                (click)="createCourse()"
+            />
+        </ng-template>
+    </p-dialog>
+</div>

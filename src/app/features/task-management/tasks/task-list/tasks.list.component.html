@@ -1,0 +1,220 @@
+<!-- tasks-list.component.html -->
+<div class="task-list-container">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="title-section">
+                <h1 class="page-title">
+                    <i class="pi pi-list-check"></i>
+                    Manage All Tasks
+                </h1>
+                <p class="page-subtitle">
+                    Monitor and manage {{ tasks.length }} tasks across your
+                    organization
+                </p>
+            </div>
+            <div class="header-actions">
+                <button
+                    pButton
+                    type="button"
+                    label="Create Task"
+                    icon="pi pi-plus"
+                    class="create-btn"
+                    (click)="navigateToCreate()"
+                ></button>
+                <button
+                    pButton
+                    type="button"
+                    icon="pi pi-refresh"
+                    class="p-button-outlined refresh-btn-outline"
+                    [loading]="isLoading"
+                    (click)="loadTasks()"
+                    pTooltip="Refresh"
+                ></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="filters-section">
+        <div class="search-wrapper">
+            <p-iconfield iconPosition="left">
+                <p-inputicon styleClass="pi pi-search" />
+                <input
+                    pInputText
+                    type="text"
+                    placeholder="Search tasks..."
+                    (input)="onGlobalFilter(dt, $event)"
+                />
+            </p-iconfield>
+        </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="table-card">
+        <p-table
+            #dt
+            [value]="tasks"
+            [rows]="10"
+            [paginator]="true"
+            [loading]="isLoading"
+            [globalFilterFields]="[
+                'title',
+                'executiveName',
+                'executiveEmployeeId',
+                'status',
+                'priority'
+            ]"
+            [tableStyle]="{ 'min-width': '75rem' }"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} tasks"
+        >
+            <!-- Header -->
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="title" style="min-width: 18rem">
+                        Task Title <p-sortIcon field="title" />
+                    </th>
+                    <th pSortableColumn="executiveName">
+                        Assigned To <p-sortIcon field="executiveName" />
+                    </th>
+                    <th pSortableColumn="priority">
+                        Priority <p-sortIcon field="priority" />
+                    </th>
+                    <th pSortableColumn="dueDate">
+                        Due Date <p-sortIcon field="dueDate" />
+                    </th>
+                    <th pSortableColumn="status">
+                        Status <p-sortIcon field="status" />
+                    </th>
+                    <th style="width: 5rem">Actions</th>
+                </tr>
+            </ng-template>
+
+            <!-- Body -->
+            <ng-template pTemplate="body" let-task>
+                <tr>
+                    <!-- Task Title -->
+                    <td>
+                        <div class="task-title-cell">
+                            <span class="task-name">{{ task.title }}</span>
+                            <span class="task-description">
+                                {{ task.ward | slice: 0 : 50
+                                }}{{
+                                    task.description.length > 50 ? '...' : ''
+                                }}
+                            </span>
+                        </div>
+                    </td>
+
+                    <!-- Assigned To -->
+                    <td>
+                        <div class="assignee-cell">
+                            <p-avatar
+                                [label]="
+                                    task.executiveName
+                                        .substring(0, 2)
+                                        .toUpperCase()
+                                "
+                                shape="circle"
+                            />
+                            <div class="assignee-info">
+                                <span class="assignee-name">{{
+                                    task.executiveName
+                                }}</span>
+                                <span class="assignee-id">{{
+                                    task.executiveEmployeeId
+                                }}</span>
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- Priority -->
+                    <td>
+                        <span
+                            class="priority-badge priority-{{ task.priority }}"
+                        >
+                            {{ task.priority.toUpperCase() }}
+                        </span>
+                    </td>
+
+                    <!-- Due Date -->
+                    <td>
+                        <div
+                            class="due-date-cell"
+                            [class.overdue]="task.isOverdue"
+                            [class.normal]="!task.isOverdue"
+                        >
+                            {{ formatDueDate(task.dueDate) }}
+                            @if (task.isOverdue) {
+                                <div class="overdue-icon">
+                                    <i class="pi pi-exclamation-triangle"></i>
+                                    Overdue
+                                </div>
+                            }
+                        </div>
+                    </td>
+
+                    <!-- Status -->
+                    <td>
+                        <p-tag
+                            [value]="
+                                task.status.replace('_', ' ').toUpperCase()
+                            "
+                            [severity]="getSeverity(task.status)"
+                        />
+                    </td>
+
+                    <!-- Actions -->
+                    <td>
+                        <div class="action-menu-btn">
+                            <p-button
+                                icon="pi pi-ellipsis-v"
+                                styleClass="p-button-text p-button-rounded"
+                                (click)="onActionsMenuClick(menu, $event, task)"
+                            />
+                            <p-menu
+                                #menu
+                                [model]="actionMenuItems"
+                                [popup]="true"
+                                [appendTo]="'body'"
+                            ></p-menu>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+
+            <!-- Empty State -->
+            <ng-template pTemplate="emptymessage">
+                <tr>
+                    <td colspan="6">
+                        @if (isLoading) {
+                            <div class="loading-state">
+                                <i class="pi pi-spin pi-spinner"></i>
+                                <p>Loading tasks...</p>
+                            </div>
+                        } @else {
+                            <div class="empty-state">
+                                <i class="pi pi-inbox"></i>
+                                <h3>No tasks found</h3>
+                                <p>Create a new task to get started</p>
+                                <button
+                                    pButton
+                                    label="Create First Task"
+                                    icon="pi pi-plus"
+                                    (click)="navigateToCreate()"
+                                ></button>
+                            </div>
+                        }
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+        <!-- ✅ SIDE DRAWER -->
+  
+
+ 
+    </div>
+
+    <p-toast />
+</div>

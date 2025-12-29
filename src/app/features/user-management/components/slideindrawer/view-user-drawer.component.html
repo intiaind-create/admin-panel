@@ -1,0 +1,116 @@
+<p-drawer 
+  [(visible)]="visible" 
+  position="right" 
+  [style]="{ width: '500px' }" 
+  [modal]="true" 
+  [closeOnEscape]="true" 
+  (onHide)="closeDrawer()"
+>
+  <ng-template pTemplate="header">
+    <div class="drawer-header">
+      <h2>
+        <i class="pi" [class]="'pi-' + (userType === 'admin' ? 'user' : 'briefcase')"></i>
+        {{ userType === 'admin' ? 'Admin' : 'Executive' }} Details
+      </h2>
+      <button 
+        pButton 
+        icon="pi pi-times" 
+        class="p-button-text p-button-rounded p-button-plain" 
+        (click)="closeDrawer()"
+        pTooltip="Close"
+        tooltipPosition="top"
+      ></button>
+    </div>
+  </ng-template>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="drawer-loading">
+    <p-progressSpinner style="width: 40px; height: 40px;"></p-progressSpinner>
+    <p class="loading-text">Loading user details...</p>
+  </div>
+
+  <!-- No Data -->
+  <div *ngIf="!isLoading && !userDetail" class="drawer-no-data">
+    <i class="pi pi-user-minus" style="font-size: 3rem; color: #6b7280;"></i>
+    <h3>No details available</h3>
+    <p>User data not found or access denied.</p>
+  </div>
+
+  <!-- User Details -->
+  <div *ngIf="!isLoading && userDetail" class="drawer-content">
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="profile-avatar">
+        <i class="pi pi-user" [class]="userType === 'admin' ? 'admin-avatar' : 'executive-avatar'"></i>
+      </div>
+      <div class="profile-info">
+        <h1>{{ userDetail.name }}</h1>
+        <p class="profile-email">{{ userDetail.email }}</p>
+        <p-tag 
+          [value]="userDetail.isActive ? 'Active' : 'Inactive'" 
+          [severity]="userDetail.isActive ? 'success' : 'danger'"
+          class="status-tag"
+        ></p-tag>
+      </div>
+    </div>
+
+    <!-- Admin Specific Fields -->
+    <div *ngIf="isAdmin()">
+      <div class="detail-section">
+        <h3>Role Information</h3>
+        <div class="detail-row">
+          <span class="label">Role</span>
+          <span class="value role-badge" [ngClass]="getRoleBadgeClass()">
+            {{ getAdminRoleName() }}
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Last Login</span>
+          <span class="value">{{ getAdminLastLogin() }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Executive Specific Fields -->
+    <div *ngIf="isExecutive()">
+      <div class="detail-section">
+        <h3>Employment Details</h3>
+        <div class="detail-row">
+          <span class="label">Employee ID</span>
+          <span class="value">{{ getEmployeeId() }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Job Title</span>
+          <span class="value">{{ getJobTitle() }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Ward</span>
+          <span class="value">{{ getWardId() }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Common Fields -->
+    <div class="detail-section">
+      <h3>Organization Details</h3>
+      <div class="detail-row">
+        <span class="label">Phone</span>
+        <span class="value">{{ userDetail.phone || 'N/A' }}</span>
+      </div>
+      <ng-container *ngIf="userDetail.hierarchyName">
+        <div class="detail-row">
+          <span class="label">Hierarchy</span>
+          <span class="value">{{ userDetail.hierarchyName }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Path</span>
+          <span class="value text-muted">{{ userDetail.hierarchyPath }}</span>
+        </div>
+      </ng-container>
+      <div class="detail-row">
+        <span class="label">Created</span>
+        <span class="value">{{ formatDate(userDetail.createdAt) }}</span>
+      </div>
+    </div>
+  </div>
+</p-drawer>

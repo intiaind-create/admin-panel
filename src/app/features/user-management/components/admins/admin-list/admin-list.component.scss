@@ -1,0 +1,598 @@
+// ============================================================================
+// ENTERPRISE BLUE COLOR PALETTE
+// ============================================================================
+$primary-blue: #1e40af; // Enterprise blue
+$primary-blue-light: #3b82f6;
+$primary-blue-dark: #1e3a8a;
+$success-green: #10b981;
+$danger-red: #ef4444;
+$warning-orange: #f59e0b;
+$neutral-50: #f9fafb;
+$neutral-100: #f3f4f6;
+$neutral-200: #e5e7eb;
+$neutral-300: #d1d5db;
+$neutral-500: #6b7280;
+$neutral-700: #374151;
+$neutral-900: #111827;
+
+// ============================================================================
+// CONTAINER
+// ============================================================================
+.admin-list-container {
+  padding: 2rem;
+  background: $neutral-50;
+  min-height: 100vh;
+  
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+// ============================================================================
+// PAGE HEADER
+// ============================================================================
+.page-header {
+  margin-bottom: 2rem;
+
+  .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 1.5rem 2rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid $primary-blue;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+  }
+
+  .title-section {
+    .page-title {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: $neutral-900;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      i {
+        color: $primary-blue;
+        font-size: 1.5rem;
+      }
+    }
+
+    .page-subtitle {
+      margin: 0;
+      font-size: 0.95rem;
+      color: $neutral-500;
+      font-weight: 400;
+    }
+  }
+
+  .create-btn {
+    background: $primary-blue;
+    border-color: $primary-blue;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: $primary-blue-dark;
+      border-color: $primary-blue-dark;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      width: 100%;
+    }
+  }
+}
+
+// ============================================================================
+// FILTERS CARD
+// ============================================================================
+.filters-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+
+  .filters-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid $neutral-100;
+
+    .filters-title {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: $neutral-900;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      i {
+        color: $primary-blue;
+      }
+    }
+
+    .clear-btn {
+      color: $danger-red;
+      font-weight: 500;
+
+      &:hover:enabled {
+        background: rgba(239, 68, 68, 0.1);
+      }
+
+      &:disabled {
+        opacity: 0.4;
+      }
+    }
+  }
+
+  .filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .filter-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .filter-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: $neutral-700;
+      margin-bottom: 0.25rem;
+    }
+
+    ::ng-deep {
+      .search-input,
+      .filter-dropdown {
+        width: 100%;
+        border: 1px solid $neutral-300;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+
+        &:hover {
+          border-color: $primary-blue-light;
+        }
+
+        &:focus {
+          border-color: $primary-blue;
+          box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+        }
+      }
+
+      .p-iconfield {
+        width: 100%;
+
+        .p-inputicon {
+          color: $neutral-500;
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// LOADING STATE
+// ============================================================================
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+
+  .loading-card {
+    text-align: center;
+    background: white;
+    padding: 3rem 4rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    .loading-icon {
+      font-size: 3rem;
+      color: $primary-blue;
+      margin-bottom: 1rem;
+    }
+
+    .loading-text {
+      margin: 0;
+      font-size: 1.1rem;
+      color: $neutral-500;
+      font-weight: 500;
+    }
+  }
+}
+
+// ============================================================================
+// ERROR STATE
+// ============================================================================
+.error-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+
+  .error-card {
+    text-align: center;
+    background: white;
+    padding: 3rem 4rem;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 2px solid rgba(239, 68, 68, 0.2);
+
+    .error-icon {
+      font-size: 3rem;
+      color: $danger-red;
+      margin-bottom: 1rem;
+    }
+
+    .error-title {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $neutral-900;
+    }
+
+    .error-message {
+      margin: 0 0 1.5rem 0;
+      font-size: 1rem;
+      color: $neutral-500;
+    }
+  }
+}
+
+// ============================================================================
+// TABLE CARD
+// ============================================================================
+.table-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+
+  ::ng-deep {
+    // Table header styling
+    .p-datatable .p-datatable-thead > tr > th {
+      background: linear-gradient(135deg, $primary-blue-dark 0%, $primary-blue 100%);
+      color: white;
+      font-weight: 600;
+      padding: 1rem;
+      border: none;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+
+      .p-sortable-column-icon {
+        color: white;
+      }
+    }
+
+    // Table body styling
+    .p-datatable .p-datatable-tbody > tr {
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: rgba(30, 64, 175, 0.05);
+      }
+
+      > td {
+        padding: 1rem;
+        color: $neutral-700;
+        font-size: 0.95rem;
+        border-bottom: 1px solid $neutral-100;
+      }
+    }
+
+    // Pagination styling
+    .p-paginator {
+      background: $neutral-50;
+      border-top: 2px solid $neutral-100;
+      padding: 1rem;
+
+      .p-paginator-current {
+        color: $neutral-700;
+        font-weight: 500;
+      }
+
+      .p-paginator-pages .p-paginator-page {
+        min-width: 2.5rem;
+        height: 2.5rem;
+        color: $neutral-700;
+        border-radius: 8px;
+
+        &.p-highlight {
+          background: $primary-blue;
+          color: white;
+        }
+
+        &:not(.p-highlight):hover {
+          background: rgba(30, 64, 175, 0.1);
+        }
+      }
+    }
+  }
+
+  // Custom cell styles
+  .admin-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .user-icon {
+      color: $primary-blue;
+      font-size: 1.1rem;
+    }
+
+    .admin-name {
+      font-weight: 600;
+      color: $neutral-900;
+    }
+  }
+
+  .email-link {
+    color: $primary-blue;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: $primary-blue-dark;
+      text-decoration: underline;
+    }
+  }
+
+  .phone-number {
+    color: $neutral-700;
+    font-family: 'Courier New', monospace;
+  }
+
+  .text-muted {
+    color: $neutral-300;
+  }
+
+  .role-badge {
+    display: inline-block;
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+
+    &.badge-super-admin {
+      background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+    }
+
+    &.badge-state {
+      background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(124, 58, 237, 0.3);
+    }
+
+    &.badge-zonal {
+      background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+    }
+
+    &.badge-district {
+      background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(8, 145, 178, 0.3);
+    }
+
+    &.badge-coordinator {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+  }
+
+  .hierarchy-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    .hierarchy-icon {
+      
+      font-size: 0.9rem;
+    }
+
+    .hierarchy-path {
+      font-size: 0.9rem;
+    }
+  }
+
+  .last-login {
+    font-size: 0.9rem;
+  }
+
+  // Actions column
+  .actions-column {
+    width: 150px;
+    text-align: center;
+  }
+
+  .actions-cell {
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 0.25rem;
+
+      .action-btn {
+        transition: all 0.2s ease;
+
+        &.view-btn {
+          color: $primary-blue;
+
+          &:hover {
+            background: rgba(30, 64, 175, 0.1);
+          }
+        }
+
+        &.edit-btn {
+          color: $warning-orange;
+
+          &:hover {
+            background: rgba(245, 158, 11, 0.1);
+          }
+        }
+
+        &.delete-btn {
+          color: $danger-red;
+
+          &:hover {
+            background: rgba(239, 68, 68, 0.1);
+          }
+        }
+      }
+    }
+  }
+
+  // Empty state
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+
+    .empty-icon {
+      font-size: 4rem;
+      color: $neutral-300;
+      margin-bottom: 1rem;
+    }
+
+    .empty-title {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: $neutral-900;
+    }
+
+    .empty-message {
+      margin: 0 0 1.5rem 0;
+      font-size: 1rem;
+      color: $neutral-500;
+    }
+  }
+}
+
+// ============================================================================
+// LOAD MORE SECTION
+// ============================================================================
+.load-more-section {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem;
+  background: $neutral-50;
+
+  .load-more-btn {
+    min-width: 200px;
+    border-color: $primary-blue;
+    color: $primary-blue;
+    font-weight: 600;
+
+    &:hover:enabled {
+      background: rgba(30, 64, 175, 0.1);
+      border-color: $primary-blue-dark;
+      color: $primary-blue-dark;
+    }
+  }
+}
+
+// ============================================================================
+// RESPONSIVE DESIGN
+// ============================================================================
+@media (max-width: 1024px) {
+  .table-card ::ng-deep {
+    .p-datatable-thead > tr > th {
+      padding: 0.75rem 0.5rem;
+      font-size: 0.85rem;
+    }
+
+    .p-datatable-tbody > tr > td {
+      padding: 0.75rem 0.5rem;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .admin-list-container {
+    padding: 1rem;
+  }
+
+  .page-header .header-content {
+    padding: 1rem;
+  }
+
+  .filters-card {
+    padding: 1rem;
+  }
+
+  .table-card ::ng-deep {
+    .p-datatable {
+      font-size: 0.85rem;
+    }
+
+    .p-paginator {
+      padding: 0.75rem;
+      font-size: 0.85rem;
+    }
+  }
+
+  .actions-cell .action-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+// ============================================================================
+// PRIMENG OVERRIDES (COMPLEMENT, NOT OVERRIDE)
+// ============================================================================
+::ng-deep {
+  // Button focus states
+  .p-button:focus {
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.2);
+  }
+
+  // Tag styling
+  .p-tag {
+    padding: 0.4rem 0.75rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  // Tooltip styling
+  .p-tooltip {
+    background: $neutral-900;
+    color: white;
+    font-size: 0.85rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+
+    .p-tooltip-arrow {
+      border-top-color: $neutral-900;
+    }
+  }
+}

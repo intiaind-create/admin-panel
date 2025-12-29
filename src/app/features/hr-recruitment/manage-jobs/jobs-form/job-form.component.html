@@ -1,0 +1,652 @@
+<div class="surface-ground px-4 py-5 md:px-6 lg:px-8">
+    <div class="flex align-items-center justify-content-between mb-4">
+        <div>
+            <h2 class="text-900 font-bold text-4xl mb-2">
+                {{ isEditMode ? 'Edit Job Posting' : 'Create Job Posting' }}
+            </h2>
+            <p class="text-600 text-lg">
+                {{
+                    isEditMode
+                        ? 'Update job details and requirements'
+                        : 'Post a new job opening'
+                }}
+            </p>
+        </div>
+        <button
+            pButton
+            type="button"
+            label="Back"
+            icon="pi pi-arrow-left"
+            class="p-button-outlined"
+            (click)="onCancel()"
+        ></button>
+    </div>
+
+    <p-toast></p-toast>
+
+    <form [formGroup]="jobForm" (ngSubmit)="onSubmit()">
+        <div class="grid">
+            <!-- BASIC INFORMATION -->
+            <div class="col-12">
+                <p-card>
+                    <ng-template pTemplate="header">
+                        <div class="px-3 pt-3">
+                            <h3 class="text-900 font-semibold text-xl mb-1">
+                                Basic Information
+                            </h3>
+                            <p class="text-600 text-sm">
+                                Job title, description, and employment details
+                            </p>
+                        </div>
+                    </ng-template>
+
+                    <div class="grid">
+                        <!-- Job Level -->
+                        <div class="field col-12 md:col-6">
+                            <label class="font-medium">
+                                Job Level <span class="text-red-500">*</span>
+                            </label>
+                            <p-select
+                                formControlName="jobLevel"
+                                [options]="jobLevels"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Select Level"
+                                styleClass="w-full"
+                            ></p-select>
+                            <small
+                                class="text-red-500"
+                                *ngIf="isFieldInvalid('jobLevel')"
+                            >
+                                {{ getFieldError('jobLevel') }}
+                            </small>
+                        </div>
+
+                        <!-- Job Title -->
+                        <div class="field col-12">
+                            <label for="title" class="font-medium">
+                                Job Title <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                pInputText
+                                id="title"
+                                formControlName="title"
+                                placeholder="e.g., Field Executive"
+                                class="w-full"
+                            />
+                            <small
+                                class="text-red-500"
+                                *ngIf="isFieldInvalid('title')"
+                            >
+                                {{ getFieldError('title') }}
+                            </small>
+                        </div>
+
+                        <!-- Job Description -->
+                        <div class="field col-12">
+                            <label for="description" class="font-medium">
+                                Job Description
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <p-editor
+                                formControlName="description"
+                                [style]="{ height: '200px' }"
+                            ></p-editor>
+                            <small
+                                class="text-red-500"
+                                *ngIf="isFieldInvalid('description')"
+                            >
+                                {{ getFieldError('description') }}
+                            </small>
+                        </div>
+
+                        <!-- Location -->
+                        <div class="field col-12 md:col-6">
+                            <label for="location" class="font-medium">
+                                Location <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                pInputText
+                                id="location"
+                                formControlName="location"
+                                placeholder="e.g., Kasaragod, Kerala"
+                                class="w-full"
+                            />
+                            <small
+                                class="text-red-500"
+                                *ngIf="isFieldInvalid('location')"
+                            >
+                                {{ getFieldError('location') }}
+                            </small>
+                        </div>
+
+                        <!-- Employment Type -->
+                        <div class="field col-12 md:col-6">
+                            <label for="employmentType" class="font-medium">
+                                Employment Type
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <p-select
+                                id="employmentType"
+                                formControlName="employmentType"
+                                [options]="employmentTypes"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Select Type"
+                                styleClass="w-full"
+                            ></p-select>
+                            <small
+                                class="text-red-500"
+                                *ngIf="isFieldInvalid('employmentType')"
+                            >
+                                {{ getFieldError('employmentType') }}
+                            </small>
+                        </div>
+
+                        <!-- Salary -->
+                        <div class="field col-12 md:col-6">
+                            <label for="salaryMin" class="font-medium">
+                                Minimum Salary (₹)
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <p-inputNumber
+                                id="salaryMin"
+                                formControlName="salaryMin"
+                                mode="currency"
+                                currency="INR"
+                                locale="en-IN"
+                                [min]="0"
+                                styleClass="w-full"
+                            ></p-inputNumber>
+                            <small
+                                class="text-red-500"
+                                *ngIf="isFieldInvalid('salaryMin')"
+                            >
+                                {{ getFieldError('salaryMin') }}
+                            </small>
+                        </div>
+
+                        <div class="field col-12 md:col-6">
+                            <label for="salaryMax" class="font-medium">
+                                Maximum Salary (₹)
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <p-inputNumber
+                                id="salaryMax"
+                                formControlName="salaryMax"
+                                mode="currency"
+                                currency="INR"
+                                locale="en-IN"
+                                [min]="0"
+                                styleClass="w-full"
+                            ></p-inputNumber>
+                            <small
+                                class="text-red-500"
+                                *ngIf="isFieldInvalid('salaryMax')"
+                            >
+                                {{ getFieldError('salaryMax') }}
+                            </small>
+                        </div>
+
+                        <!-- Deadline -->
+                        <div class="field col-12 md:col-6">
+                            <label
+                                for="applicationDeadline"
+                                class="font-medium"
+                            >
+                                Application Deadline
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <p-datepicker
+                                id="applicationDeadline"
+                                formControlName="applicationDeadline"
+                                [minDate]="minDate"
+                                dateFormat="dd/mm/yy"
+                                [showIcon]="true"
+                                placeholder="Select Date"
+                                styleClass="w-full"
+                            ></p-datepicker>
+                            <small
+                                class="text-red-500"
+                                *ngIf="isFieldInvalid('applicationDeadline')"
+                            >
+                                {{ getFieldError('applicationDeadline') }}
+                            </small>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+
+            <!-- GEOGRAPHIC LOCATION + WARD SCOPE -->
+            <div
+                class="col-12"
+                *ngIf="
+                    currentJobLevel === 'WARD_MANAGER' ||
+                    currentJobLevel === 'LOCAL_BODY_MANAGER' ||
+                    currentJobLevel === 'SUBDISTRICT_MANAGER' ||
+                    currentJobLevel === 'DISTRICT_MANAGER' ||
+                    currentJobLevel === 'ZONAL_MANAGER' ||
+                    currentJobLevel === 'EXECUTIVE'
+                "
+            >
+                <p-card>
+                    <ng-template pTemplate="header">
+                        <div class="px-3 pt-3">
+                            <h3 class="text-900 font-semibold text-xl mb-1">
+                                Geographic Location & Ward Scope
+                            </h3>
+                            <p class="text-600 text-sm">
+                                Select area and configure ward restrictions
+                            </p>
+                        </div>
+                    </ng-template>
+
+                    <!-- Zone -->
+                    <div class="field">
+                        <label for="zone" class="form-label">
+                            Zone
+                            <span
+                                class="text-red-600"
+                                *ngIf="isGeoFieldRequired('zone')"
+                                >*</span
+                            >
+                        </label>
+                        <p-select
+                            id="zone"
+                            [options]="zones"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="Select Zone"
+                            formControlName="zone"
+                            (onChange)="onZoneChange($event)"
+                            [showClear]="true"
+                            [loading]="loadingDistricts"
+                            styleClass="w-full"
+                        ></p-select>
+                        <small
+                            class="text-red-600"
+                            *ngIf="isFieldInvalid('zone')"
+                        >
+                            {{ getFieldError('zone') }}
+                        </small>
+                    </div>
+
+                    <!-- District -->
+                    <div class="field" *ngIf="districts.length > 0">
+                        <label for="district" class="form-label">
+                            District
+                            <span
+                                class="text-red-600"
+                                *ngIf="isGeoFieldRequired('district')"
+                                >*</span
+                            >
+                        </label>
+                        <p-select
+                            id="district"
+                            [options]="districts"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="Select District"
+                            formControlName="district"
+                            (onChange)="onDistrictChange($event)"
+                            [showClear]="true"
+                            [loading]="loadingSubdistricts"
+                            styleClass="w-full"
+                        ></p-select>
+                        <small
+                            class="text-red-600"
+                            *ngIf="isFieldInvalid('district')"
+                        >
+                            {{ getFieldError('district') }}
+                        </small>
+                    </div>
+
+                    <!-- Subdistrict -->
+                    <div
+                        class="field"
+                        *ngIf="
+                            (currentJobLevel === 'SUBDISTRICT_MANAGER' ||
+                                currentJobLevel === 'LOCAL_BODY_MANAGER' ||
+                                currentJobLevel === 'WARD_MANAGER' ||
+                                currentJobLevel === 'EXECUTIVE' ||
+                                currentJobLevel === 'DISTRICT_MANAGER') &&
+                            subdistricts.length > 0
+                        "
+                    >
+                        <label for="subdistrict" class="form-label">
+                            Subdistrict
+                            <span
+                                class="text-red-600"
+                                *ngIf="isGeoFieldRequired('subdistrict')"
+                                >*</span
+                            >
+                        </label>
+                        <p-select
+                            id="subdistrict"
+                            [options]="subdistricts"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="Select Subdistrict"
+                            formControlName="subdistrict"
+                            (onChange)="onSubdistrictChange($event)"
+                            [showClear]="true"
+                            [loading]="loadingLocalBodies"
+                            styleClass="w-full"
+                        ></p-select>
+                        <small
+                            class="text-red-600"
+                            *ngIf="isFieldInvalid('subdistrict')"
+                        >
+                            {{ getFieldError('subdistrict') }}
+                        </small>
+                    </div>
+
+                    <!-- Local Body Type -->
+                    <div
+                        class="field"
+                        *ngIf="
+                            (currentJobLevel === 'LOCAL_BODY_MANAGER' ||
+                                currentJobLevel === 'WARD_MANAGER' ||
+                                currentJobLevel === 'EXECUTIVE') &&
+                            localBodyTypes.length > 0
+                        "
+                    >
+                        <label for="localBodyType" class="form-label">
+                            Local Body Type (Optional)
+                        </label>
+                        <p-select
+                            id="localBodyType"
+                            [options]="localBodyTypes"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="All Types"
+                            formControlName="localBodyType"
+                            (onChange)="onLocalBodyTypeChange($event)"
+                            [showClear]="true"
+                            styleClass="w-full"
+                        ></p-select>
+                    </div>
+
+                    <!-- Local Body -->
+                    <div
+                        class="field"
+                        *ngIf="
+                            (currentJobLevel === 'LOCAL_BODY_MANAGER' ||
+                                currentJobLevel === 'WARD_MANAGER' ||
+                                currentJobLevel === 'EXECUTIVE') &&
+                            localBodies.length > 0
+                        "
+                    >
+                        <label for="localBodyName" class="form-label">
+                            Local Body
+                            <span
+                                class="text-red-600"
+                                *ngIf="isGeoFieldRequired('localBodyName')"
+                                >*</span
+                            >
+                        </label>
+                        <p-select
+                            id="localBodyName"
+                            [options]="localBodies"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="Select Local Body"
+                            formControlName="localBodyName"
+                            (onChange)="onLocalBodyChange($event)"
+                            [showClear]="true"
+                            [loading]="loadingWards"
+                            styleClass="w-full"
+                        ></p-select>
+                        <small
+                            class="text-red-600"
+                            *ngIf="isFieldInvalid('localBodyName')"
+                        >
+                            {{ getFieldError('localBodyName') }}
+                        </small>
+                    </div>
+
+                    <!-- ✅ WARD SCOPE SECTION (All levels that show geo) -->
+                    <div *ngIf="wards.length > 0" class="mt-6">
+                        <p-divider></p-divider>
+
+                        <div
+                            class="flex justify-content-between align-items-center mb-4"
+                        >
+                            <h4 class="m-0">Ward Scope</h4>
+                            <p-tag
+                                [value]="
+                                    jobForm.get('restrictToWardScope')?.value
+                                        ? 'Restricted'
+                                        : 'Open'
+                                "
+                                [severity]="
+                                    jobForm.get('restrictToWardScope')?.value
+                                        ? 'danger'
+                                        : 'success'
+                                "
+                            ></p-tag>
+                        </div>
+
+                        <!-- Ward Restriction Toggle -->
+                        <div class="field col-12 mb-4">
+                            <div class="flex items-center gap-2">
+                                <p-checkbox
+                                    formControlName="restrictToWardScope"
+                                    binary="true"
+                                    inputId="restrictToWardScope"
+                                ></p-checkbox>
+                                <label
+                                    for="restrictToWardScope"
+                                    class="font-medium cursor-pointer"
+                                >
+                                    Restrict applications to selected ward(s)
+                                    only
+                                </label>
+                            </div>
+                            <small class="text-gray-600 block mt-1">
+                                <i
+                                    *ngIf="
+                                        !jobForm.get('restrictToWardScope')
+                                            ?.value
+                                    "
+                                    class="pi pi-lock-open text-green-500 mr-1"
+                                ></i>
+                                <i
+                                    *ngIf="
+                                        jobForm.get('restrictToWardScope')
+                                            ?.value
+                                    "
+                                    class="pi pi-lock text-red-500 mr-1"
+                                ></i>
+                                {{
+                                    jobForm.get('restrictToWardScope')?.value
+                                        ? 'Only applicants from selected ward(s) can apply'
+                                        : 'Open to applicants from any ward in Kerala'
+                                }}
+                            </small>
+                        </div>
+
+                        <!-- Blanketed toggle -->
+                        <div class="field">
+                            <div class="flex items-center gap-2">
+                                <p-checkbox
+                                    formControlName="isBlanketed"
+                                    [binary]="true"
+                                    inputId="isBlanketed"
+                                ></p-checkbox>
+                                <label
+                                    for="isBlanketed"
+                                    class="font-medium cursor-pointer"
+                                >
+                                    Blanketed Posting (Multiple wards)
+                                </label>
+                            </div>
+                            <small class="text-gray-600 block mt-1">
+                                Enable to post job to multiple wards in selected
+                                area ({{ wardCount }} wards available)
+                            </small>
+                        </div>
+
+                        <!-- Single ward selection -->
+                        <div
+                            class="field mt-3"
+                            *ngIf="!jobForm.get('isBlanketed')?.value"
+                        >
+                            <label for="wardId" class="form-label">
+                                Specific Ward
+                                <span
+                                    class="text-red-600"
+                                    *ngIf="isGeoFieldRequired('wardId')"
+                                    >*</span
+                                >
+                            </label>
+                            <p-select
+                                id="wardId"
+                                formControlName="wardId"
+                                [options]="wards"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Select Ward"
+                                [filter]="true"
+                                filterBy="label,fullPath"
+                                [loading]="loadingWards"
+                                [disabled]="
+                                    !jobForm.get('localBodyName')?.value
+                                "
+                                styleClass="w-full"
+                            ></p-select>
+                            <small
+                                class="text-gray-600 block mt-1"
+                                *ngIf="getSelectedWardPath()"
+                            >
+                                📍 {{ getSelectedWardPath() }}
+                            </small>
+                            <small
+                                class="text-red-500"
+                                *ngIf="isFieldInvalid('wardId')"
+                            >
+                                {{ getFieldError('wardId') }}
+                            </small>
+                        </div>
+
+                        <!-- Blanketed info -->
+                        <div
+                            class="field mt-3"
+                            *ngIf="jobForm.get('isBlanketed')?.value"
+                        >
+                            <div
+                                class="bg-blue-50 border border-blue-200 rounded-lg p-4"
+                            >
+                                <div class="flex items-start gap-3">
+                                    <i
+                                        class="pi pi-info-circle text-blue-500 text-xl"
+                                    ></i>
+                                    <div class="flex-1">
+                                        <p
+                                            class="font-medium text-blue-900 mb-1"
+                                        >
+                                            Blanketed Job Scope
+                                        </p>
+                                        <p class="text-sm text-blue-700">
+                                            This job will be posted to
+                                            <strong>
+                                                {{ wardCount }} ward{{
+                                                    wardCount !== 1 ? 's' : ''
+                                                }}
+                                            </strong>
+                                            in the selected area.
+                                        </p>
+                                        <p
+                                            class="text-sm text-blue-600 mt-2"
+                                            *ngIf="wardCount === 0"
+                                        >
+                                            ⚠️ Please select at least a district
+                                            to see targeted wards.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+
+            <!-- REQUIREMENTS -->
+            <div class="col-12">
+                <p-card>
+                    <ng-template pTemplate="header">
+                        <div
+                            class="px-3 pt-3 flex justify-content-between align-items-center"
+                        >
+                            <div>
+                                <h3 class="text-900 font-semibold text-xl mb-1">
+                                    Requirements
+                                </h3>
+                                <p class="text-600 text-sm">
+                                    List the key requirements for this position
+                                </p>
+                            </div>
+                            <button
+                                pButton
+                                type="button"
+                                label="Add Requirement"
+                                icon="pi pi-plus"
+                                class="p-button-sm"
+                                (click)="addRequirement()"
+                            ></button>
+                        </div>
+                    </ng-template>
+
+                    <div formArrayName="requirements">
+                        <div
+                            *ngFor="
+                                let requirement of requirementsArray.controls;
+                                let i = index
+                            "
+                            class="flex gap-2 mb-3"
+                        >
+                            <div class="flex-1">
+                                <input
+                                    pInputText
+                                    [formControlName]="i"
+                                    placeholder="e.g., Bachelor's degree in relevant field"
+                                    class="w-full"
+                                />
+                            </div>
+                            <button
+                                pButton
+                                type="button"
+                                icon="pi pi-trash"
+                                class="p-button-danger p-button-outlined"
+                                (click)="removeRequirement(i)"
+                                [disabled]="requirementsArray.length === 1"
+                            ></button>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="col-12">
+                <div class="flex justify-content-end gap-2">
+                    <button
+                        pButton
+                        type="button"
+                        label="Cancel"
+                        icon="pi pi-times"
+                        class="p-button-outlined"
+                        (click)="onCancel()"
+                        [disabled]="loading"
+                    ></button>
+                    <button
+                        pButton
+                        type="submit"
+                        [label]="isEditMode ? 'Update Job' : 'Create Job'"
+                        icon="pi pi-check"
+                        [loading]="loading"
+                    ></button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

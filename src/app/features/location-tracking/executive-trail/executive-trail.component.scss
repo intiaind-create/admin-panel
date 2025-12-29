@@ -1,0 +1,169 @@
+@import 'leaflet/dist/leaflet.css';
+
+:host {
+  display: block;
+  position: relative;
+  left: -14px;
+  width: calc(100% + 28px);
+  margin: 0;
+  padding: 0;
+}
+
+
+:host ::ng-deep {
+  .grid {
+    display: block !important; // Force grid to behave like a normal block
+  }
+
+  .col-12,
+  .col-md-3,
+  .col-md-4,
+  .col-lg-4,
+  .col-lg-8 {
+    padding: 0.875rem; // ✅ Add back padding inside
+  }
+
+  .p-card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  }
+
+  .p-card-body {
+    padding: 0;
+  }
+
+  .p-card-content {
+    padding: 1.25rem;
+  }
+
+  .p-card-header {
+    background: var(--surface-card);
+    border-bottom: 1px solid var(--surface-border);
+    padding: 0;
+  }
+
+  .stat-card {
+    .p-card-body {
+      padding: 1.5rem;
+    }
+  }
+
+  .map-wrapper {
+    position: relative;
+    width: 100%;
+    height: 600px;
+    margin: 0;
+    padding: 0;
+  }
+
+  #trail-map {
+    width: 100%;
+    height: 600px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .map-skeleton {
+    width: 100%;
+  }
+
+  .map-legend {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: white;
+    padding: 12px 16px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+  }
+
+  .legend-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+  }
+
+  .legend-icon-start {
+    background-color: #22c55e;
+  }
+
+  .legend-icon-end {
+    background-color: #ef4444;
+  }
+
+  .legend-line {
+    width: 40px;
+    height: 3px;
+    background-color: #3b82f6;
+    border-radius: 2px;
+  }
+
+  .timeline-card {
+    height: 100%;
+
+    .p-card-body {
+      padding: 0;
+    }
+
+    .p-card-content {
+      padding: 1rem;
+      max-height: 680px;
+      overflow-y: auto;
+    }
+  }
+
+  .custom-timeline {
+    .p-timeline-event-opposite {
+      display: none;
+    }
+
+    .p-timeline-event-content {
+      padding-left: 1rem;
+    }
+  }
+
+  .timeline-item {
+    padding-bottom: 0.5rem;
+  }
+
+  .timeline-skeleton {
+    padding: 1rem;
+  }
+
+  .trail-popup {
+    h6 {
+      margin: 0 0 8px 0;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .popup-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 0.8rem;
+
+      i {
+        color: var(--text-color-secondary);
+        width: 14px;
+      }
+    }
+
+    .battery-success {
+      color: #22c55e;
+      font-weight: 600;
+    }
+
+    .battery-warning {
+      color: #f59e0b;
+      font-weight: 600;
+    }
+
+    .battery-danger {
+      color: #ef4444;
+      font-weight: 600;
+    }
+  }
+}

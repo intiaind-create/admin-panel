@@ -1,0 +1,44 @@
+<!-- src/app/features/dashboard/recent-status/recent-submissions-widget.component.html -->
+
+<div class="card h-full">
+  <div class="font-semibold text-xl mb-4" i18n>Recent Submissions</div>
+  
+  @if (isLoading) {
+    <div class="flex justify-center items-center py-8">
+      <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+      <span class="ml-3">Loading...</span>
+    </div>
+  }
+  
+  @else if (errorMessage) {
+    <div class="p-message p-message-error">
+      <div class="p-message-wrapper">
+        <span class="p-message-icon pi pi-times-circle"></span>
+        <div class="p-message-detail">{{ errorMessage }}</div>
+      </div>
+    </div>
+  }
+  
+  @else if (submissions.length === 0) {
+    <div class="text-center py-8">
+      <i class="pi pi-inbox" style="font-size: 3rem; color: var(--text-color-secondary)"></i>
+      <p class="mt-3 mb-0">No recent submissions</p>
+    </div>
+  }
+  
+  @else {
+    <p-timeline [value]="submissions" align="left">
+      <ng-template pTemplate="content" let-submission>
+        <div class="ml-3">
+          <span class="font-semibold">{{ submission.title }}</span>
+          <div class="text-sm text-color-secondary mt-1">
+            Status: {{ submission.status }}
+          </div>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="opposite" let-submission>
+        <small class="p-text-secondary">{{ formatTime(getTimestamp(submission)) }}</small>
+      </ng-template>
+    </p-timeline>
+  }
+</div>

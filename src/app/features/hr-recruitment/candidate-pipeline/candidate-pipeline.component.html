@@ -1,0 +1,226 @@
+<div class="candidate-pipeline-container">
+  <p-toast></p-toast>
+
+  <!-- Header with Job Filter -->
+  <div class="pipeline-header">
+    <h2>Candidate Pipeline</h2>
+
+    <div class="job-filter">
+      <p-select
+        [options]="availableJobs()"
+        [(ngModel)]="selectedJob"
+        (onChange)="onJobSelect($event.value)"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select a job posting"
+        [filter]="true"
+        filterPlaceholder="Search jobs..."
+        [showClear]="true"
+        styleClass="job-select"
+      >
+      
+        <ng-template let-job pTemplate="item">
+          <div class="job-option">
+            <span class="job-title">{{ job.label }}</span>
+            <span class="job-count">{{ job.totalApplications }} applications</span>
+          </div>
+        </ng-template>
+      </p-select>
+    </div>
+  </div>
+
+  <!-- Location Filters (only when a job is selected) -->
+  <div class="location-filters" *ngIf="selectedJob()">
+    <div class="filter-header">
+      <h3>Filter by Location</h3>
+      <button
+        pButton
+        type="button"
+        label="Clear All"
+        icon="pi pi-times"
+        class="p-button-text p-button-sm clear-btn"
+        (click)="clearFilters()"
+      ></button>
+    </div>
+
+    <!-- Quick Ward Search -->
+    <div class="filter-row">
+      <div class="filter-item full-width">
+        <label>Quick Ward Search</label>
+        <input
+          pInputText
+          type="text"
+          class="ward-search-input"
+          placeholder="Type ward name (min 2 chars)..."
+          [(ngModel)]="wardSearchQuery"
+          (ngModelChange)="onWardSearch($event)"
+        />
+
+        <div class="ward-search-results" *ngIf="wardSearchResults().length > 0">
+          <div
+            *ngFor="let ward of wardSearchResults()"
+            class="ward-result-item"
+            (click)="selectedWard.set(ward._id); applyFilters()"
+          >
+            <strong>{{ ward.wardName }}</strong>
+            <span class="ward-path">{{ ward.fullPath }}</span>
+          </div>
+        </div>
+
+        <div class="search-loading" *ngIf="searchingWards()">
+          <i class="pi pi-spin pi-spinner"></i> Searching...
+        </div>
+
+        <div
+          class="no-results"
+          *ngIf="!searchingWards() && wardSearchResults().length === 0 && wardSearchQuery().length > 1"
+        >
+          No wards found
+        </div>
+      </div>
+    </div>
+
+    <div class="filter-divider">OR filter step by step:</div>
+
+    <!-- Step-by-step filters -->
+    <div class="filter-row">
+      <div class="filter-item">
+        <label>Zone</label>
+        <p-select
+          [options]="zones()"
+          [(ngModel)]="selectedZone"
+          (onChange)="onZoneChange($event.value)"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select zone"
+          [showClear]="true"
+          styleClass="filter-select"
+        ></p-select>
+      </div>
+
+      <div class="filter-item">
+        <label>District</label>
+        <p-select
+          [options]="districts()"
+          [(ngModel)]="selectedDistrict"
+          (onChange)="onDistrictChange($event.value)"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select district"
+          [showClear]="true"
+          [disabled]="districts().length === 0"
+          styleClass="filter-select"
+        ></p-select>
+      </div>
+
+      <div class="filter-item">
+        <label>Subdistrict</label>
+        <p-select
+          [options]="subdistricts()"
+          [(ngModel)]="selectedSubdistrict"
+          (onChange)="onSubdistrictChange($event.value)"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select subdistrict"
+          [showClear]="true"
+          [disabled]="subdistricts().length === 0"
+          styleClass="filter-select"
+        ></p-select>
+      </div>
+
+      <div class="filter-item">
+        <label>Local Body Type</label>
+        <p-select
+          [options]="localBodyTypes()"
+          [(ngModel)]="selectedLocalBodyType"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select type"
+          [showClear]="true"
+          styleClass="filter-select"
+        ></p-select>
+      </div>
+
+      <div class="filter-item">
+        <label>Local Body</label>
+        <p-select
+          [options]="localBodies()"
+          [(ngModel)]="selectedLocalBody"
+          (onChange)="onLocalBodyChange($event.value)"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select local body"
+          [showClear]="true"
+          [disabled]="localBodies().length === 0"
+          styleClass="filter-select"
+        ></p-select>
+      </div>
+
+      <div class="filter-item">
+        <label>Ward</label>
+        <p-select
+          [options]="wards()"
+          [(ngModel)]="selectedWard"
+          (onChange)="applyFilters()"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select ward"
+          [showClear]="true"
+          [disabled]="wards().length === 0"
+          styleClass="filter-select"
+        ></p-select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="loading-state">
+    <i class="pi pi-spin pi-spinner"></i>
+    Loading pipeline data...
+  </div>
+
+  <!-- Pipeline stages -->
+  <div
+    *ngIf="!loading() && stages().length > 0"
+    class="pipeline-stages"
+  >
+<app-pipeline-stage
+  *ngFor="let stage of stages()"
+  [stage]="stage"
+  [allStageIds]="allStageIds"
+  (cardDropped)="onDrop($event, stage.stageId)"
+  (cardSelected)="onCardSelect($event.card, $event.stageId)"
+  (loadMore)="onLoadMoreStage(stage.stageId)"
+></app-pipeline-stage>
+  </div>
+
+  <!-- Empty state -->
+  <div
+    *ngIf="!loading() && stages().length === 0"
+    class="empty-state"
+  >
+    <i class="pi pi-inbox"></i>
+    <p>No applications found. Select a job to view candidates.</p>
+  </div>
+
+  <!-- Candidate detail drawer -->
+<p-drawer
+  [visible]="drawerVisible()"
+  (visibleChange)="drawerVisible.set($event)"
+  position="right"
+  [style]="{ width: '500px' }"
+  (onHide)="closeDrawer()"
+>
+    <ng-template pTemplate="header">
+      <h3>Candidate Details</h3>
+    </ng-template>
+
+    <app-candidate-detail
+      *ngIf="selectedCard() && selectedStageId()"
+      [candidate]="selectedCard()!"
+      [currentStage]="selectedStageId()!"
+      (candidateUpdated)="onCandidateUpdate()"
+      (closeDrawer)="closeDrawer()"
+    ></app-candidate-detail>
+  </p-drawer>
+</div>

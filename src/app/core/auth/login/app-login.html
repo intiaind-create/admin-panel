@@ -1,0 +1,194 @@
+<!-- Background SVG (optional subtle background) -->
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 1600 800"
+  class="login-bg"
+  preserveAspectRatio="none"
+></svg>
+
+<div class="login-page">
+  <!-- Top brand header -->
+  <header class="login-header">
+    <div class="login-header-logo">
+     We One Admin
+    </div>
+  </header>
+
+  <!-- Center shell -->
+  <main class="login-shell">
+    <div
+      data-cy="login-container"
+      class="login-panel"
+    >
+      <!-- LEFT: main login content -->
+      <section class="login-main">
+        <div class="mb-6">
+          <div
+            data-cy="login-title"
+            class="login-title"
+          >
+            Log in
+          </div>
+          <span
+            data-cy="login-subtitle"
+            class="login-subtitle"
+          >
+            Please enter your details
+          </span>
+        </div>
+
+        @if (loginForm) {
+        <div class="flex flex-col" [formGroup]="loginForm">
+          <!-- Email -->
+          <p-iconfield class="w-full mb-1">
+            <p-inputicon class="pi pi-envelope" />
+            <input
+              data-cy="email-input"
+              type="text"
+              pInputText
+              placeholder="Email"
+              formControlName="email"
+            />
+            <small
+              *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+              data-cy="email-error"
+              class="p-error"
+            >
+              Please enter a valid email address
+            </small>
+          </p-iconfield>
+
+          @if (loginForm.get('email')?.touched &&
+          loginForm.get('email')?.hasError('serverError')) {
+          <div data-cy="email-error" class="p-error text-xs mb-5">
+            {{ loginForm.get('email')?.getError('serverError') }}
+          </div>
+          }
+
+          <!-- Password -->
+          <p-iconfield class="w-full mb-1">
+            <p-inputicon class="pi pi-lock" />
+            <input
+              data-cy="password-input"
+              [type]="passwordVisible ? 'text' : 'password'"
+              pInputText
+              placeholder="Password"
+              formControlName="password"
+            />
+            <button
+              data-cy="password-toggle"
+              type="button"
+              pButton
+              [icon]="passwordVisible ? 'pi pi-eye-slash' : 'pi pi-eye'"
+              (click)="passwordVisible = !passwordVisible"
+              class="p-button-text"
+            ></button>
+            <small
+              *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+              data-cy="password-error"
+              class="p-error"
+            >
+              Password is required
+            </small>
+          </p-iconfield>
+
+          @if (loginForm.get('password')?.touched &&
+          loginForm.get('password')?.hasError('serverError')) {
+          <div data-cy="password-error" class="p-error text-xs mb-5">
+            {{ loginForm.get('password')?.getError('serverError') }}
+          </div>
+          }
+
+          <!-- Remember + reset -->
+          <div class="login-meta mb-6 mt-5">
+            <!-- <div class="flex items-center">
+              <p-checkbox
+                data-cy="remember-me-checkbox"
+                name="checkbox"
+                formControlName="rememberMe"
+                [binary]="true"
+                styleClass="mr-2"
+                class="flex"
+              ></p-checkbox>
+              <label class="font-medium ml-2">Remember Me</label>
+            </div> -->
+            <a
+              data-cy="forgot-password-link"
+              (click)="onForgotPassword()"
+              class="cursor-pointer"
+            >
+              Reset password
+            </a>
+          </div>
+
+          <!-- Login button -->
+          <button
+            data-cy="login-button"
+            pButton
+            pRipple
+            label="Log In"
+            class="login-button"
+            (click)="handleLogin()"
+            [disabled]="isLoading || loginForm.invalid"
+          ></button>
+        </div>
+        }
+      </section>
+
+      <!-- RIGHT: context/info column -->
+      <aside class="login-side">
+        <h2 class="login-side-title">Executive Admin Console</h2>
+        <p class="login-side-text">
+          Control up to 12 levels of administrators, approvals and organization
+          settings from a single secure interface.
+        </p>
+        <p class="login-side-text">
+          Use your corporate email and credentials provided by the central
+          IT or security team.
+        </p>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<!-- Forgot password dialog -->
+<p-dialog
+  header="Forgot Password"
+  [(visible)]="showForgotPasswordDialog"
+  [modal]="true"
+  styleClass="w-90 md:w-30rem"
+  [draggable]="false"
+>
+  <div class="p-fluid">
+    <div class="field">
+      <label for="forgotEmail" class="font-medium mb-2 block">Email Address</label>
+      <input
+        id="forgotEmail"
+        pInputText
+        [(ngModel)]="forgotEmail"
+        placeholder="Enter your email"
+        class="w-full"
+        [disabled]="forgotLoading"
+      />
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <button
+      pButton
+      type="button"
+      label="Cancel"
+      class="p-button-text"
+      (click)="showForgotPasswordDialog = false"
+    ></button>
+    <button
+      pButton
+      type="button"
+      label="Send Reset Link"
+      [loading]="forgotLoading"
+      [disabled]="!forgotEmail || !forgotEmail.includes('@') || forgotLoading"
+      (click)="submitForgotPassword()"
+    ></button>
+  </ng-template>
+</p-dialog>
+
+<p-toast data-cy="toast-message"></p-toast>

@@ -1,0 +1,724 @@
+// ============================================================================
+// ORDERS MANAGEMENT - FOLLOWING ADMIN/EXECUTIVE PATTERN
+// ============================================================================
+
+// Color Palette (Enterprise Blue)
+$primary-blue: #1e40af;
+$primary-blue-light: #3b82f6;
+$primary-blue-dark: #1e3a8a;
+$primary-green: #10b981;
+$success-green: #10b981;
+$danger-red: #ef4444;
+$warning-orange: #f59e0b;
+$neutral-50: #f9fafb;
+$neutral-100: #f3f4f6;
+$neutral-200: #e5e7eb;
+$neutral-300: #d1d5db;
+$neutral-500: #6b7280;
+$neutral-700: #374151;
+$neutral-900: #111827;
+
+// ============================================================================
+// CONTAINER
+// ============================================================================
+.view-orders-page {
+    padding: 1.5rem 2rem;
+    background: $neutral-50;
+    min-height: 100vh;
+
+    @media (max-width: 768px) {
+        padding: 1rem;
+    }
+}
+
+// ============================================================================
+// PAGE HEADER
+// ============================================================================
+.page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+    }
+}
+
+.page-title {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: $neutral-900;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    i {
+        font-size: 1.4rem;
+        color: $primary-green;
+    }
+}
+
+.page-subtitle {
+    margin: 0.25rem 0 0;
+    font-size: 0.875rem;
+    color: $neutral-500;
+}
+
+.page-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+// ============================================================================
+// STATS CARDS
+// ============================================================================
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+}
+
+.stat-card {
+    border: 1px solid $neutral-200;
+    border-radius: 0.9rem;
+    padding: 0.85rem 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: #ffffff;
+    cursor: pointer;
+    text-align: left;
+    transition:
+        box-shadow 0.15s ease,
+        border-color 0.15s ease,
+        transform 0.1s ease;
+
+    &:hover {
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+        border-color: $neutral-300;
+        transform: translateY(-1px);
+    }
+}
+
+.stat-icon-wrapper {
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.icon-blue {
+    background: #3b82f6;
+}
+.icon-amber {
+    background: #f59e0b;
+}
+.icon-sky {
+    background: #0ea5e9;
+}
+.icon-green {
+    background: #10b981;
+}
+.icon-teal {
+    background: #14b8a6;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: $neutral-500;
+}
+
+.stat-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: $neutral-900;
+}
+
+.stat-hint {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+// ============================================================================
+// FILTER BAR
+// ============================================================================
+.filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1.1rem;
+    border-radius: 0.75rem;
+    background: #ffffff;
+    border: 1px solid $neutral-200;
+    margin-bottom: 1.1rem;
+
+    @media (max-width: 1024px) {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+.filter-search {
+    flex: 1;
+    min-width: 0;
+    max-width: 420px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.5rem 0.65rem 0.5rem 2.2rem !important;
+    font-size: 0.875rem;
+    border-radius: 0.6rem;
+    border: 1px solid $neutral-300 !important;
+    background: #ffffff !important;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+
+    &:focus {
+        border-color: #6366f1 !important;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+        outline: none;
+    }
+}
+
+::ng-deep .p-input-icon-left > .pi {
+    left: 0.65rem;
+    color: #9ca3af;
+    font-size: 0.9rem;
+}
+
+.filter-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+
+    @media (max-width: 1024px) {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+}
+
+::ng-deep .filter-select {
+    min-width: 110px;
+
+    .p-select-label {
+        padding: 0.45rem 0.65rem;
+        font-size: 0.8125rem;
+    }
+
+    .p-select-dropdown {
+        width: 2rem;
+    }
+}
+
+.clear-btn {
+    margin-left: 0.25rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: $neutral-500;
+    padding: 0.45rem 0.75rem;
+
+    &:hover {
+        background: $neutral-100 !important;
+        color: $neutral-700;
+    }
+}
+
+// ============================================================================
+// TABLE WRAPPER - FOLLOWING ADMIN PATTERN
+// ============================================================================
+.table-wrapper {
+    background: #ffffff;
+    border: 1px solid $neutral-200;
+    border-radius: 0.9rem;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+// ============================================================================
+// TABLE STYLES - SIMPLE ::ng-deep LIKE ADMIN COMPONENT
+// ============================================================================
+::ng-deep {
+    .p-datatable {
+        border: none;
+    }
+
+    // Table Header - Blue gradient like admin
+    .p-datatable .p-datatable-thead > tr > th {
+        background: linear-gradient(
+            135deg,
+            $primary-blue-dark 0%,
+            $primary-blue 100%
+        );
+        color: white;
+        font-weight: 600;
+        padding: 1rem 0.75rem;
+        border: none;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    // Table Body Cells
+    .p-datatable .p-datatable-tbody > tr {
+        transition: all 0.2s ease;
+
+        &:hover {
+            background: rgba(30, 64, 175, 0.05);
+        }
+
+        > td {
+            padding: 1rem 0.75rem;
+            color: $neutral-700;
+            font-size: 0.875rem;
+            border-bottom: 1px solid $neutral-100;
+            vertical-align: middle;
+        }
+    }
+
+    // Column-specific padding - Order ID
+    .col-id {
+        padding-left: 0.75rem !important;
+        padding-right: 0.5rem !important;
+    }
+
+    // Customer/Executive column
+    .col-person {
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+    }
+
+    // Status column
+    .col-status {
+        text-align: center !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.75rem !important;
+    }
+
+    // Payment column
+    .col-payment {
+        text-align: center !important;
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+
+    // Total column
+    .col-total {
+        text-align: right !important;
+        padding-left: 0.5rem !important;
+        padding-right: 1.5rem !important;
+    }
+
+    // Date column
+    .col-date {
+        padding-left: 1.5rem !important;
+        padding-right: 0.75rem !important;
+    }
+
+    // Actions column
+    .col-actions {
+        text-align: center !important;
+        padding-left: 0.75rem !important;
+        padding-right: 2rem !important;
+    }
+
+    // Pagination
+    .p-paginator {
+        background: $neutral-50;
+        border-top: 2px solid $neutral-100;
+        padding: 1rem;
+
+        .p-paginator-current {
+            color: $neutral-700;
+            font-weight: 500;
+        }
+
+        .p-paginator-pages .p-paginator-page {
+            min-width: 2.5rem;
+            height: 2.5rem;
+            color: $neutral-700;
+            border-radius: 8px;
+
+            &.p-highlight {
+                background: $primary-blue;
+                color: white;
+            }
+
+            &:not(.p-highlight):hover {
+                background: rgba(30, 64, 175, 0.1);
+            }
+        }
+    }
+
+    // Tags
+    .p-tag {
+        padding: 0.375rem 0.75rem;
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: capitalize;
+    }
+}
+
+// ============================================================================
+// CELL CONTENT STYLES
+// ============================================================================
+.order-id-badge {
+    font-family:
+        ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 700;
+    color: $primary-green;
+    font-size: 0.85rem;
+}
+
+.person-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.person-name {
+    font-weight: 600;
+    color: $neutral-900;
+    font-size: 0.875rem;
+}
+
+.person-meta {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.total-value {
+    font-weight: 700;
+    color: $neutral-900;
+    font-size: 0.875rem;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+::ng-deep .action-buttons .p-button {
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+
+    .p-button-icon {
+        font-size: 0.875rem;
+    }
+}
+
+// ============================================================================
+// EMPTY STATE
+// ============================================================================
+.empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    color: $neutral-500;
+
+    i {
+        font-size: 2.5rem;
+        color: $neutral-300;
+        margin-bottom: 0.75rem;
+        display: block;
+    }
+
+    p {
+        margin: 0;
+        font-size: 0.95rem;
+    }
+}
+
+// ============================================================================
+// DIALOG STYLES
+// ============================================================================
+.order-details-wrapper {
+    background-color: #fff;
+    font-family: inherit;
+}
+
+.details-header {
+    background-color: #f8fafc;
+    padding: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.info-card {
+    flex: 1;
+    min-width: 180px;
+    background: white;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.card-value {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.details-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.section-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+}
+
+.section-title {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    color: #334155;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #f1f5f9;
+
+    i {
+        color: #64748b;
+    }
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.info-label {
+    color: #64748b;
+}
+
+.info-value {
+    color: #0f172a;
+    font-weight: 500;
+    text-align: right;
+}
+
+.address-block {
+    font-size: 0.9rem;
+    color: #334155;
+    line-height: 1.5;
+}
+
+.address-name {
+    margin: 0 0 0.25rem 0;
+    font-size: 1rem;
+    color: #0f172a;
+}
+
+.address-line {
+    margin: 0;
+}
+
+.table-scroll {
+    overflow-x: auto;
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+
+    th {
+        text-align: left;
+        padding: 0.75rem;
+        background: #f8fafc;
+        color: #64748b;
+        font-weight: 600;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+    }
+
+    td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #f1f5f9;
+        color: #334155;
+        vertical-align: middle;
+    }
+
+    .center-cell {
+        text-align: center;
+    }
+
+    .right-cell {
+        text-align: right;
+    }
+}
+
+.product-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.product-name {
+    font-weight: 500;
+    color: #0f172a;
+}
+
+.product-sku {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.amount-bold {
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.summary-row td {
+    border-bottom: none;
+    padding: 0.5rem 0.75rem;
+}
+
+.summary-label {
+    text-align: right;
+    color: #64748b;
+    padding-right: 1rem;
+}
+
+.summary-value {
+    text-align: right;
+    color: #0f172a;
+    font-weight: 500;
+
+    &.discount {
+        color: #ef4444;
+    }
+}
+
+.total-row td {
+    padding-top: 1rem;
+    border-top: 2px solid #e2e8f0;
+    font-size: 1.1rem;
+}
+
+.dialog-actions {
+    padding: 1rem 1.5rem;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+// ============================================================================
+// RESPONSIVE
+// ============================================================================
+@media (max-width: 1024px) {
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-controls {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 768px) {
+    .view-orders-page {
+        padding: 1rem;
+    }
+
+    .page-header {
+        flex-direction: column;
+    }
+
+    .stats-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-row {
+        grid-template-columns: 1fr;
+    }
+
+    .page-title {
+        font-size: 1.35rem;
+    }
+}

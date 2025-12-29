@@ -1,0 +1,35 @@
+<p-drawer
+    [visible]="visible()"
+    (onHide)="onDrawerHide()"
+    position="right"
+    styleClass="layout-profile-sidebar w-full sm:w-25rem"
+>
+    <div class="flex flex-col mx-auto md:mx-0">
+        <span class="mb-2 font-semibold">Welcome</span>
+        <span class="text-surface-900 dark:text-surface-0 font-semibold text-xl mb-1">
+            {{ userName() }}
+        </span>
+        <span class="text-surface-500 dark:text-surface-400 font-medium text-sm mb-2">
+            {{ userRole() }}
+        </span>
+        <span class="text-surface-400 dark:text-surface-500 text-sm mb-6">
+            {{ userEmail() }}
+        </span>
+
+        <ul class="list-none m-0 p-0">
+            <li>
+                <a (click)="signOut()" class="cursor-pointer flex p-4 items-center border border-surface-200 dark:border-surface-700 rounded hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors duration-150">
+                    <span>
+                        <i class="pi pi-power-off text-xl text-primary"></i>
+                    </span>
+                    <div class="ml-4">
+                        <span class="mb-2 font-semibold">Sign Out</span>
+                        <p class="text-surface-500 dark:text-surface-400 m-0 text-sm">
+                            End your session
+                        </p>
+                    </div>
+                </a>
+            </li>
+        </ul>
+    </div>
+</p-drawer>

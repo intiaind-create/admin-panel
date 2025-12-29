@@ -1,0 +1,218 @@
+<div class="grid" id="container" style="margin-right: 20rem;">
+  <!-- Header Card -->
+  <div class="col-8">
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="flex justify-content-between align-items-center px-4 py-3">
+          <div>
+            <h5 class="m-0">{{ trail()?.executiveName || 'Executive' }} - Location Trail</h5>
+            <p class="text-color-secondary m-0 mt-1">
+              {{ trail()?.employeeId ? 'ID: ' + trail()!.employeeId : '' }}
+            </p>
+          </div>
+          <div class="flex gap-2">
+            <p-select
+              [options]="timeRangeOptions"
+              [(ngModel)]="selectedTimeRange"
+              optionLabel="label"
+              optionValue="value"
+              (onChange)="onTimeRangeChange($event.value)"
+              placeholder="Select Time Range"
+              [style]="{ minWidth: '200px' }"
+            ></p-select>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-arrow-left"
+              label="Back to Map"
+              routerLink="/location-tracking/live-map"
+              class="p-button-outlined p-button-sm"
+            ></button>
+            <button
+              pButton
+              type="button"
+              icon="pi pi-refresh"
+              (click)="loadTrail()"
+              [loading]="isLoading()"
+              class="p-button-outlined p-button-sm"
+            ></button>
+          </div>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="col-12" *ngIf="trail() && !isLoading()">
+    <div class="grid">
+      <div class="col-12 md:col-3">
+        <p-card styleClass="stat-card">
+          <div class="flex align-items-center justify-content-between">
+            <div>
+              <div class="text-color-secondary text-sm mb-2">Total Points</div>
+              <div class="text-3xl font-bold">{{ calculateStats().totalPoints }}</div>
+            </div>
+            <i class="pi pi-map-marker text-4xl text-primary"></i>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-12 md:col-3">
+        <p-card styleClass="stat-card">
+          <div class="flex align-items-center justify-content-between">
+            <div>
+              <div class="text-color-secondary text-sm mb-2">Distance Traveled</div>
+              <div class="text-3xl font-bold">{{ calculateStats().distance.toFixed(1) }} km</div>
+            </div>
+            <i class="pi pi-compass text-4xl text-green-500"></i>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-12 md:col-3">
+        <p-card styleClass="stat-card">
+          <div class="flex align-items-center justify-content-between">
+            <div>
+              <div class="text-color-secondary text-sm mb-2">Duration</div>
+              <div class="text-3xl font-bold">{{ calculateStats().duration.toFixed(1) }} hrs</div>
+            </div>
+            <i class="pi pi-clock text-4xl text-blue-500"></i>
+          </div>
+        </p-card>
+      </div>
+
+      <div class="col-12 md:col-3">
+        <p-card styleClass="stat-card">
+          <div class="flex align-items-center justify-content-between">
+            <div>
+              <div class="text-color-secondary text-sm mb-2">Avg Speed</div>
+              <div class="text-3xl font-bold">{{ calculateStats().avgSpeed.toFixed(1) }} km/h</div>
+            </div>
+            <i class="pi pi-bolt text-4xl text-orange-500"></i>
+          </div>
+        </p-card>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map and Timeline -->
+  <div class="col-12 lg:col-8">
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="px-4 py-3">
+          <h6 class="m-0">Trail Map</h6>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="content">
+        <!-- Loading Skeleton -->
+        <div *ngIf="isLoading()" class="map-skeleton">
+          <p-skeleton height="600px"></p-skeleton>
+        </div>
+
+        <!-- Map -->
+        <div *ngIf="!isLoading()" class="map-wrapper">
+          <div id="trail-map" class="trail-map"></div>
+
+          <!-- Legend -->
+          <div class="map-legend">
+            <div class="flex flex-column gap-2">
+              <div class="flex align-items-center gap-2">
+                <div class="legend-icon legend-icon-start"></div>
+                <span class="text-sm">Start Point</span>
+              </div>
+              <div class="flex align-items-center gap-2">
+                <div class="legend-icon legend-icon-end"></div>
+                <span class="text-sm">Current Location</span>
+              </div>
+              <div class="flex align-items-center gap-2">
+                <div class="legend-line"></div>
+                <span class="text-sm">Path Traveled</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoading() && (!trail() || trail()!.locations.length === 0)" 
+             class="text-center py-8">
+          <i class="pi pi-map-marker text-6xl text-color-secondary mb-4"></i>
+          <h6 class="text-color-secondary">No trail data available</h6>
+          <p class="text-color-secondary text-sm">
+            No location history found for the selected time range
+          </p>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+
+  <!-- Timeline Sidebar -->
+  <div class="col-12 lg:col-4">
+    <p-card styleClass="timeline-card">
+      <ng-template pTemplate="header">
+        <div class="px-4 py-3">
+          <h6 class="m-0">Location History</h6>
+        </div>
+      </ng-template>
+
+      <ng-template pTemplate="content">
+        <!-- Loading Skeleton -->
+        <div *ngIf="isLoading()" class="timeline-skeleton">
+          <p-skeleton *ngFor="let item of [1, 2, 3, 4, 5]" height="80px" class="mb-3"></p-skeleton>
+        </div>
+
+        <!-- Timeline -->
+        <p-timeline *ngIf="!isLoading() && trail()" [value]="getTimelineEvents()" class="custom-timeline">
+          <ng-template pTemplate="content" let-event>
+            <div class="timeline-item">
+              <div class="flex justify-content-between align-items-start mb-2">
+                <div class="font-bold">{{ event.time }}</div>
+                <p-tag
+                  *ngIf="event.isFirst"
+                  severity="danger"
+                  value="Current"
+                  icon="pi pi-map-marker"
+                  styleClass="text-xs"
+                ></p-tag>
+                <p-tag
+                  *ngIf="event.isLast"
+                  severity="success"
+                  value="Start"
+                  icon="pi pi-flag"
+                  styleClass="text-xs"
+                ></p-tag>
+              </div>
+              <div class="text-color-secondary text-sm mb-2">{{ event.date }}</div>
+              <div class="text-sm mb-2">
+                <i class="pi pi-map-marker text-xs mr-1"></i>
+                {{ event.coords }}
+              </div>
+              <div class="flex gap-2" *ngIf="event.battery || event.isMoving !== undefined">
+                <p-tag
+                  *ngIf="event.battery"
+                  [severity]="getBatteryColor(event.battery)"
+                  [value]="event.battery + '%'"
+                  icon="pi pi-bolt"
+                  styleClass="text-xs"
+                ></p-tag>
+                <p-tag
+                  *ngIf="event.isMoving !== undefined"
+                  [severity]="event.isMoving ? 'info' : 'secondary'"
+                  [value]="event.isMoving ? 'Moving' : 'Stationary'"
+                  styleClass="text-xs"
+                ></p-tag>
+              </div>
+            </div>
+          </ng-template>
+        </p-timeline>
+
+        <!-- Empty State -->
+        <div *ngIf="!isLoading() && (!trail() || getTimelineEvents().length === 0)" 
+             class="text-center py-5">
+          <i class="pi pi-clock text-4xl text-color-secondary mb-3"></i>
+          <p class="text-color-secondary m-0">No history available</p>
+        </div>
+      </ng-template>
+    </p-card>
+  </div>
+</div>

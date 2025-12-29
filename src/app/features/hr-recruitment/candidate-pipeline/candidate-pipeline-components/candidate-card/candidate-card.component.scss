@@ -1,0 +1,97 @@
+$neutral-100: #f3f4f6;
+$neutral-200: #e5e7eb;
+$neutral-500: #6b7280;
+$neutral-700: #374151;
+$neutral-900: #111827;
+$primary-blue-light: #3b82f6;
+
+.candidate-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 1rem;
+    border: 1px solid $neutral-200;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.14);
+        border-color: $primary-blue-light;
+    }
+}
+
+/* Header: avatar + info */
+.candidate-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.candidate-card-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #ffffff;
+    background: #10b981;
+    flex-shrink: 0;
+}
+
+.candidate-card-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.candidate-card-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: $neutral-900;
+    margin-bottom: 0.1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.candidate-card-email {
+    font-size: 0.8rem;
+    color: $neutral-500;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    i {
+        font-size: 0.75rem;
+    }
+}
+
+/* Meta row */
+.candidate-card-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: 0.6rem;
+    margin-top: 0.4rem;
+    border-top: 1px solid $neutral-100;
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        color: $neutral-500;
+
+        i {
+            font-size: 0.7rem;
+        }
+    }
+}

@@ -1,0 +1,496 @@
+<div class="public-application-container">
+  <p-toast></p-toast>
+
+  <!-- Header -->
+  <div class="public-header">
+    <div class="logo-section">
+      <img src="https://i.postimg.cc/ZKxR5Smt/logo.jpg" alt="WeOne Logo" class="logo">
+      <h1 class="title">WeOne - Field Executive Recruitment</h1>
+    </div>
+    <p class="subtitle">Join our team to help connect every household in Kerala</p>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-wrapper">
+    <p-card class="application-card">
+      <!-- Job Selection Section -->
+      <div class="section job-selection-section">
+        <h2 class="section-title">Select a Position</h2>
+        <p class="section-subtitle">Choose the job you want to apply for</p>
+
+        <div class="form-field">
+          <label class="field-label">
+            Position Applied For <span class="required-star">*</span>
+          </label>
+          <p-select
+            [options]="jobs()"
+            [loading]="loadingJobs()"
+            [style]="{ width: '100%' }"
+            optionLabel="title"
+            optionValue="_id"
+            placeholder="Select a job posting"
+            [filter]="true"
+            filterBy="title,location"
+            (onChange)="onJobChange($event.value)"
+            [ngModel]="selectedJobId()"
+            [class.error]="!selectedJobId() && form.touched"
+          >
+            <ng-template let-job pTemplate="item">
+              <div class="job-dropdown-item">
+                <div class="job-main-info">
+                  <div class="job-title">{{ job.title }}</div>
+                  <div class="job-meta">
+                    {{ job.location }} • {{ employmentTypeLabel(job.employmentType) }}
+                  </div>
+                </div>
+                <div class="job-deadline">
+                  <span class="deadline-label">Deadline:</span>
+                  <span class="deadline-value">{{ formatDeadline(job.applicationDeadline) }}</span>
+                </div>
+              </div>
+            </ng-template>
+          </p-select>
+
+          <!-- Job Scope Badge -->
+          <div class="job-scope-badge" *ngIf="selectedJob()">
+            <p-tag
+              [value]="selectedJob()?.isBlanketed ? 'Multiple Wards' : 'Specific Ward'"
+              [severity]="selectedJob()?.isBlanketed ? 'info' : 'success'"
+            ></p-tag>
+          </div>
+        </div>
+
+        <p-divider></p-divider>
+      </div>
+
+      <!-- Application Form - Only show if job is selected -->
+      <div *ngIf="showForm()">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="application-form">
+          
+          <!-- Personal Details Section -->
+          <div class="section">
+            <h2 class="section-title">Personal Details</h2>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label class="field-label">
+                  Full Name <span class="required-star">*</span>
+                </label>
+                <input
+                  pInputText
+                  type="text"
+                  formControlName="name"
+                  placeholder="Your full name"
+                  [class.error]="isFieldInvalid('name')"
+                />
+                <small class="error-message" *ngIf="isFieldInvalid('name')">
+                  {{ getFieldError('name') }}
+                </small>
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">
+                  Guardian's Name <span class="required-star">*</span>
+                </label>
+                <input
+                  pInputText
+                  type="text"
+                  formControlName="guardianName"
+                  placeholder="Father/Mother/Spouse name"
+                  [class.error]="isFieldInvalid('guardianName')"
+                />
+                <small class="error-message" *ngIf="isFieldInvalid('guardianName')">
+                  {{ getFieldError('guardianName') }}
+                </small>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label class="field-label">
+                  Date of Birth <span class="required-star">*</span>
+                </label>
+                <p-datepicker
+                  formControlName="dateOfBirth"
+                  [maxDate]="maxDate"
+                  placeholder="Select date"
+                  dateFormat="dd/mm/yy"
+                  [showIcon]="true"
+                  [style]="{ width: '100%' }"
+                  [class.error]="isFieldInvalid('dateOfBirth')"
+                ></p-datepicker>
+                <small class="helper-text">Must be 18 years or older</small>
+                <small class="error-message" *ngIf="isFieldInvalid('dateOfBirth')">
+                  {{ getFieldError('dateOfBirth') }}
+                </small>
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">Age (Years)</label>
+                <input
+                  pInputText
+                  type="text"
+                  formControlName="age"
+                  placeholder="Auto-calculated"
+                  readonly
+                  class="readonly-field"
+                />
+                <small class="helper-text">Automatically calculated from date of birth</small>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label class="field-label">
+                  Sex <span class="required-star">*</span>
+                </label>
+                <p-select
+                  formControlName="sex"
+                  [options]="sexOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select sex"
+                  [style]="{ width: '100%' }"
+                  [class.error]="isFieldInvalid('sex')"
+                ></p-select>
+                <small class="error-message" *ngIf="isFieldInvalid('sex')">
+                  {{ getFieldError('sex') }}
+                </small>
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">
+                  Highest Qualification <span class="required-star">*</span>
+                </label>
+                <p-select
+                  formControlName="qualification"
+                  [options]="qualificationOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select qualification"
+                  [style]="{ width: '100%' }"
+                  [class.error]="isFieldInvalid('qualification')"
+                ></p-select>
+                <small class="error-message" *ngIf="isFieldInvalid('qualification')">
+                  {{ getFieldError('qualification') }}
+                </small>
+              </div>
+            </div>
+
+            <p-divider></p-divider>
+          </div>
+
+          <!-- Contact Details Section -->
+          <div class="section">
+            <h2 class="section-title">Contact Information</h2>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label class="field-label">
+                  Email <span class="required-star">*</span>
+                </label>
+                <input
+                  pInputText
+                  type="email"
+                  formControlName="email"
+                  placeholder="you@example.com"
+                  [class.error]="isFieldInvalid('email')"
+                />
+                <small class="error-message" *ngIf="isFieldInvalid('email')">
+                  {{ getFieldError('email') }}
+                </small>
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">
+                  Phone Number <span class="required-star">*</span>
+                </label>
+                <input
+                  pInputText
+                  type="tel"
+                  formControlName="phone"
+                  placeholder="10-digit mobile number"
+                  maxlength="10"
+                  [class.error]="isFieldInvalid('phone')"
+                />
+                <small class="error-message" *ngIf="isFieldInvalid('phone')">
+                  {{ getFieldError('phone') }}
+                </small>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label class="field-label">Alternate Phone Number</label>
+                <input
+                  pInputText
+                  type="tel"
+                  formControlName="alternatePhone"
+                  placeholder="10-digit number (optional)"
+                  maxlength="10"
+                  [class.error]="isFieldInvalid('alternatePhone')"
+                />
+                <small class="error-message" *ngIf="isFieldInvalid('alternatePhone')">
+                  {{ getFieldError('alternatePhone') }}
+                </small>
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">
+                  Experience (years) <span class="required-star">*</span>
+                </label>
+                <p-inputNumber
+                  formControlName="experience"
+                  [min]="0"
+                  [max]="50"
+                  [maxFractionDigits]="1"
+                  [style]="{ width: '100%' }"
+                  [class.error]="isFieldInvalid('experience')"
+                ></p-inputNumber>
+                <small class="error-message" *ngIf="isFieldInvalid('experience')">
+                  {{ getFieldError('experience') }}
+                </small>
+              </div>
+            </div>
+
+            <p-divider></p-divider>
+          </div>
+
+          <!-- Document Upload Section -->
+          <div class="section">
+            <h2 class="section-title">Document Uploads</h2>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label class="field-label">
+                  ID Card Type <span class="required-star">*</span>
+                </label>
+                <p-select
+                  formControlName="idType"
+                  [options]="idTypeOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select ID type"
+                  [style]="{ width: '100%' }"
+                  [class.error]="isFieldInvalid('idType')"
+                ></p-select>
+                <small class="error-message" *ngIf="isFieldInvalid('idType')">
+                  {{ getFieldError('idType') }}
+                </small>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label class="field-label">
+                  Upload ID Card (JPG/PNG/PDF, max 1MB) <span class="required-star">*</span>
+                </label>
+                <div class="file-upload-wrapper">
+                  <p-fileUpload
+                    mode="basic"
+                    name="idCard"
+                    accept=".jpg,.jpeg,.png,.pdf"
+                    [auto]="true"
+                    [customUpload]="true"
+                    [maxFileSize]="1024 * 1024"
+                    [chooseLabel]="uploadingIdCard() ? 'Uploading...' : (idCardId() ? 'Change ID Card' : 'Choose ID Card')"
+                    (uploadHandler)="onFileSelect($event, 'idCard')"
+                    [disabled]="uploadingIdCard()"
+                    [class.has-file]="idCardId()"
+                  ></p-fileUpload>
+                  
+                  <!-- File Status -->
+                  <div class="file-status" *ngIf="idCardId()">
+                    <i class="pi pi-check-circle success-icon"></i>
+                    <span class="file-name">{{ idCardFileName() }}</span>
+                    <button 
+                      type="button" 
+                      class="clear-file-btn" 
+                      (click)="clearFile('idCard')"
+                      [disabled]="uploadingIdCard()"
+                    >
+                      <i class="pi pi-times"></i>
+                    </button>
+                  </div>
+                </div>
+                <small class="helper-text">Accepted formats: JPG, PNG, PDF (Max size: 1MB)</small>
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">
+                  Upload Resume (PDF, max 2MB) <span class="required-star">*</span>
+                </label>
+                <div class="file-upload-wrapper">
+                  <p-fileUpload
+                    mode="basic"
+                    name="resume"
+                    accept=".pdf,.doc,.docx"
+                    [auto]="true"
+                    [customUpload]="true"
+                    [maxFileSize]="2 * 1024 * 1024"
+                    [chooseLabel]="uploadingResume() ? 'Uploading...' : (resumeId() ? 'Change Resume' : 'Choose Resume')"
+                    (uploadHandler)="onFileSelect($event, 'resume')"
+                    [disabled]="uploadingResume()"
+                    [class.has-file]="resumeId()"
+                  ></p-fileUpload>
+                  
+                  <!-- File Status -->
+                  <div class="file-status" *ngIf="resumeId()">
+                    <i class="pi pi-check-circle success-icon"></i>
+                    <span class="file-name">{{ resumeFileName() }}</span>
+                    <button 
+                      type="button" 
+                      class="clear-file-btn" 
+                      (click)="clearFile('resume')"
+                      [disabled]="uploadingResume()"
+                    >
+                      <i class="pi pi-times"></i>
+                    </button>
+                  </div>
+                </div>
+                <small class="helper-text">Accepted formats: PDF, DOC, DOCX (Max size: 2MB)</small>
+              </div>
+            </div>
+
+            <p-divider></p-divider>
+          </div>
+
+          <!-- Location Section -->
+          <div class="section">
+            <h2 class="section-title">Your Location</h2>
+            <p class="section-subtitle">Select your location to match job requirements</p>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label class="field-label">Zone</label>
+                <p-select
+                  formControlName="zone"
+                  [options]="zones()"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select zone"
+                  [loading]="loadingZones()"
+                  (onChange)="onZoneChange($event)"
+                  [style]="{ width: '100%' }"
+                ></p-select>
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">District</label>
+                <p-select
+                  formControlName="district"
+                  [options]="districts()"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select district"
+                  [loading]="loadingDistricts()"
+                  (onChange)="onDistrictChange($event)"
+                  [style]="{ width: '100%' }"
+                  [disabled]="!form.value.zone"
+                ></p-select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <label class="field-label">Subdistrict</label>
+                <p-select
+                  formControlName="subdistrict"
+                  [options]="subdistricts()"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select subdistrict"
+                  [loading]="loadingSubdistricts()"
+                  (onChange)="onSubdistrictChange($event)"
+                  [style]="{ width: '100%' }"
+                  [disabled]="!form.value.district"
+                ></p-select>
+              </div>
+
+              <div class="form-field">
+                <label class="field-label">Local Body</label>
+                <p-select
+                  formControlName="localBodyName"
+                  [options]="localBodies()"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select local body"
+                  [loading]="loadingLocalBodies()"
+                  (onChange)="onLocalBodyChange($event)"
+                  [style]="{ width: '100%' }"
+                  [disabled]="!form.value.subdistrict"
+                ></p-select>
+              </div>
+            </div>
+
+            <!-- Ward - Only show if required -->
+            <div class="form-row" *ngIf="requiresWard()">
+              <div class="form-field full-width">
+                <label class="field-label">
+                  Ward <span class="required-star">*</span>
+                </label>
+                <p-select
+                  formControlName="wardId"
+                  [options]="wards()"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select your ward"
+                  [loading]="loadingWards()"
+                  (onChange)="onWardChange($event)"
+                  [style]="{ width: '100%' }"
+                  [disabled]="!form.value.localBodyName"
+                  [class.error]="isFieldInvalid('wardId')"
+                ></p-select>
+                <small class="helper-text" *ngIf="form.value.wardName">
+                  Selected: {{ form.value.wardName }}
+                </small>
+                <small class="error-message" *ngIf="isFieldInvalid('wardId')">
+                  Please select your ward
+                </small>
+              </div>
+            </div>
+
+            <!-- Ward not required message -->
+            <div class="info-message" *ngIf="!requiresWard() && selectedJob()">
+              <i class="pi pi-info-circle"></i>
+              <span>This job is open to applicants from any ward</span>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="submit-section">
+            <button
+              pButton
+              type="button"
+              label="Clear Form"
+              class="clear-btn"
+              severity="secondary"
+              [outlined]="true"
+              (click)="resetForm()"
+            ></button>
+            <button
+              pButton
+              type="submit"
+              label="Submit Application"
+              class="submit-btn"
+              [loading]="submitting()"
+              [disabled]="!resumeId() || !idCardId()"
+            ></button>
+          </div>
+        </form>
+      </div>
+
+      <!-- No Job Selected Message -->
+      <div *ngIf="!showForm() && !loadingJobs()" class="empty-state">
+        <i class="pi pi-briefcase empty-icon"></i>
+        <h3>Please Select a Job</h3>
+        <p>Select a job posting from the dropdown above to continue with your application.</p>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Footer -->
+  <div class="public-footer">
+    <p>© 2025 WeOne by Intia OPC Pvt. Ltd. All rights reserved.</p>
+  </div>
+</div>

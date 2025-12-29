@@ -1,0 +1,46 @@
+@use '../../admins//admin-list/admin-list.component.scss' as adminStyles; // ✅ Reuse admin styles
+
+
+// ✅ SAME ENTERPRISE BLUE THEME as Admin List
+.executive-list-container {
+  padding: 2rem;
+  background: #f9fafb;
+  min-height: 100vh;
+}
+
+
+// Override specific selectors
+.page-title i {
+  color: #10b981; // Green for executives
+}
+
+.employee-id {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  color: #1e40af;
+  background: rgba(30, 64, 175, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.manager-name {
+  color: #374151;
+  font-weight: 500;
+}
+
+.executive-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  .user-icon {
+    color: #10b981; // Green theme
+    font-size: 1.1rem;
+  }
+
+  .executive-name {
+    font-weight: 600;
+    color: #111827;
+  }
+}

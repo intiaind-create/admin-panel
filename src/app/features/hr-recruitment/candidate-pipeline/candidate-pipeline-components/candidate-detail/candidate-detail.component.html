@@ -1,0 +1,276 @@
+<ng-container *ngIf="candidateData as card">
+    <!-- Candidate Header -->
+    <div class="text-center mb-4">
+        <p-avatar
+            data-cy="candidate-avatar"
+            [label]="getInitials(card.candidateName)"
+            size="xlarge"
+            shape="circle"
+            [style]="{
+                'background-color': '#2196F3',
+                color: '#ffffff',
+                'font-size': '2rem'
+            }"
+        />
+        <h3 data-cy="candidate-name" class="mt-3 mb-1">
+            {{ card.candidateName }}
+        </h3>
+        <p-tag
+            data-cy="candidate-stage-tag"
+            [value]="stageId!"
+            [severity]="
+                stageId === 'selected'
+                    ? 'success'
+                    : stageId === 'rejected'
+                      ? 'danger'
+                      : 'info'
+            "
+        />
+    </div>
+
+    <p-divider />
+
+    <!-- Contact Information -->
+    <div class="mb-4">
+        <h4 class="mb-3">Contact Information</h4>
+
+        <div class="flex align-items-center gap-2 mb-2">
+            <i class="pi pi-envelope"></i>
+            <a
+                data-cy="candidate-email"
+                [href]="'mailto:' + card.email"
+                class="text-primary"
+            >
+                {{ card.email }}
+            </a>
+        </div>
+
+        <div class="flex align-items-center gap-2 mb-2">
+            <i class="pi pi-phone"></i>
+            <a
+                data-cy="candidate-phone"
+                [href]="'tel:' + card.phone"
+                class="text-primary"
+            >
+                {{ card.phone }}
+            </a>
+        </div>
+
+        <div class="flex align-items-center gap-2">
+            <i class="pi pi-briefcase"></i>
+            <span data-cy="candidate-experience"
+                >{{ card.experience }} years of experience</span
+            >
+        </div>
+    </div>
+
+    <p-divider />
+
+    <!-- Application Details -->
+    <div class="mb-4">
+        <h4 class="mb-3">Application Details</h4>
+
+        <div class="mb-2">
+            <span class="font-semibold">Applied Date:</span>
+            <span data-cy="candidate-applied-date" class="ml-2">{{
+                card.appliedDate
+            }}</span>
+        </div>
+
+        <div *ngIf="card.wardId" class="mb-2">
+            <span class="font-semibold">Assigned Ward:</span>
+            <p-tag
+                data-cy="candidate-ward-tag"
+                [value]="card.wardId"
+                severity="secondary"
+                class="ml-2"
+            />
+        </div>
+
+        <div *ngIf="card.interviewDate" class="mb-2">
+            <span class="font-semibold">Interview Date:</span>
+            <span class="ml-2">{{ card.interviewDate }}</span>
+        </div>
+    </div>
+
+    <p-divider />
+
+    <!-- Interview Notes -->
+    <div *ngIf="card.interviewNotes" class="mb-4">
+        <h4 class="mb-3">Interview Notes</h4>
+        <p class="text-muted">{{ card.interviewNotes }}</p>
+    </div>
+
+    <!-- Rejection Reason -->
+    <div *ngIf="card.rejectionReason" class="mb-4">
+        <h4 class="mb-3">Rejection Reason</h4>
+        <p class="text-danger">{{ card.rejectionReason }}</p>
+    </div>
+
+    <!-- Reject Candidate Section (if not already rejected) -->
+    <div *ngIf="stageId !== 'rejected'" class="mb-4">
+        <h4 class="mb-3">Reject Candidate</h4>
+        <textarea
+            data-cy="rejection-reason-input"
+            pInputTextarea
+            [(ngModel)]="rejectionReason"
+            placeholder="Enter rejection reason..."
+            rows="4"
+            class="w-full mb-3"
+        ></textarea>
+        <p-button
+            data-cy="reject-button"
+            label="Reject Candidate"
+            icon="pi pi-times"
+            severity="danger"
+            (onClick)="rejectCandidate()"
+            [disabled]="!rejectionReason.trim()"
+            styleClass="w-full"
+        />
+    </div>
+
+    <p-divider />
+
+    <!-- Actions -->
+    <p-divider />
+
+    <!-- Stage Actions -->
+    <div class="mb-4">
+        <h4 class="mb-3">Stage Actions</h4>
+
+        <!-- From APPLIED -->
+        <div *ngIf="stageId === 'applied'" class="flex gap-2 mb-2">
+            <p-button
+                label="Move to Shortlisted"
+                icon="pi pi-arrow-right"
+                severity="info"
+                styleClass="flex-1"
+                (onClick)="changeStatus('shortlisted')"
+            ></p-button>
+            <p-button
+                label="Move to Interviewed"
+                icon="pi pi-calendar"
+                severity="info"
+                styleClass="flex-1"
+                (onClick)="changeStatus('interviewed')"
+            ></p-button>
+        </div>
+
+        <!-- From SHORTLISTED -->
+        <div *ngIf="stageId === 'shortlisted'" class="flex gap-2 mb-2">
+            <p-button
+                label="Move to Interviewed"
+                icon="pi pi-calendar"
+                severity="info"
+                styleClass="flex-1"
+                (onClick)="changeStatus('interviewed')"
+            ></p-button>
+            <p-button
+                label="Mark as Selected"
+                icon="pi pi-check"
+                severity="success"
+                styleClass="flex-1"
+                (onClick)="changeStatus('selected')"
+            ></p-button>
+        </div>
+
+        <!-- From INTERVIEWED -->
+        <div *ngIf="stageId === 'interviewed'" class="flex gap-2 mb-2">
+            <p-button
+                label="Mark as Selected"
+                icon="pi pi-check"
+                severity="success"
+                styleClass="flex-1"
+                (onClick)="changeStatus('selected')"
+            ></p-button>
+        </div>
+
+        <!-- From SELECTED -->
+        <div *ngIf="stageId === 'selected'" class="flex gap-2 mb-2">
+            <p-button
+                label="Create {{
+                    (candidateData?.jobTitle || '')
+                        .toLowerCase()
+                        .includes('executive')
+                        ? 'Executive'
+                        : 'Admin'
+                }}"
+                icon="pi pi-user-plus"
+                severity="success"
+                styleClass="flex-1"
+                (onClick)="createUserAccount()"
+            ></p-button>
+        </div>
+
+        <!-- From REJECTED -->
+        <div *ngIf="stageId === 'rejected'" class="flex flex-column gap-2 mb-2">
+            <p-button
+                label="Move back to Applied"
+                icon="pi pi-undo"
+                severity="info"
+                styleClass="w-full"
+                (onClick)="changeStatus('applied')"
+            ></p-button>
+            <p-button
+                label="Move to Shortlisted"
+                icon="pi pi-arrow-right"
+                severity="info"
+                styleClass="w-full"
+                (onClick)="changeStatus('shortlisted')"
+            ></p-button>
+            <p-button
+                label="Move to Interviewed"
+                icon="pi pi-calendar"
+                severity="info"
+                styleClass="w-full"
+                (onClick)="changeStatus('interviewed')"
+            ></p-button>
+        </div>
+    </div>
+
+    <p-divider />
+
+    <!-- Reject Candidate (available in all stages) -->
+    <div class="mb-4">
+        <h4 class="mb-3">Reject Candidate</h4>
+        <textarea
+            data-cy="rejection-reason-input"
+            pInputTextarea
+            [(ngModel)]="rejectionReason"
+            placeholder="Enter rejection reason..."
+            rows="4"
+            class="w-full mb-3"
+        ></textarea>
+        <p-button
+            data-cy="reject-button"
+            label="Reject Candidate"
+            icon="pi pi-times"
+            severity="danger"
+            (onClick)="rejectCandidate()"
+            [disabled]="!rejectionReason.trim()"
+            styleClass="w-full"
+        ></p-button>
+    </div>
+
+    <p-divider />
+
+    <!-- Footer actions -->
+    <div class="flex gap-2">
+        <p-button
+            data-cy="view-resume-button"
+            label="View Resume"
+            icon="pi pi-file-pdf"
+            severity="secondary"
+            styleClass="flex-1"
+            (onClick)="viewResume()"
+        ></p-button>
+        <p-button
+            data-cy="close-drawer-button"
+            label="Close"
+            icon="pi pi-times"
+            severity="secondary"
+            styleClass="flex-1"
+            (onClick)="onHide()"
+        ></p-button>
+    </div>
+</ng-container>

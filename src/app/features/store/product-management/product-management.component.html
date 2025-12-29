@@ -1,0 +1,374 @@
+<div class="p-4">
+  <p-toast />
+  <p-confirmDialog />
+
+  <!-- Toolbar -->
+  <p-toolbar class="mb-4">
+    <ng-template pTemplate="left">
+      <h2 class="m-0 text-2xl font-semibold">Product Management</h2>
+    </ng-template>
+    <ng-template pTemplate="right">
+      <p-button
+        label="New Product"
+        icon="pi pi-plus"
+        severity="success"
+        (onClick)="openNew()"
+      />
+    </ng-template>
+  </p-toolbar>
+
+  <!-- Data Table -->
+  <p-table
+    #dt
+    [value]="products()"
+    [rows]="10"
+    [paginator]="true"
+    [globalFilterFields]="['name', 'sku', 'category']"
+    [tableStyle]="{ 'min-width': '75rem' }"
+    [(selection)]="selectedProducts"
+    [rowHover]="true"
+    dataKey="_id"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+    [showCurrentPageReport]="true"
+    [loading]="loading()"
+  >
+    <!-- Header -->
+    <ng-template pTemplate="caption">
+      <div class="flex align-items-center justify-content-between">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            (input)="onGlobalFilter(dt, $event)"
+            placeholder="Search products..."
+          />
+        </span>
+      </div>
+    </ng-template>
+
+    <!-- Table Headers -->
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 4rem">
+          <p-tableHeaderCheckbox />
+        </th>
+        <th pSortableColumn="name">
+          Product <p-sortIcon field="name" />
+        </th>
+        <th pSortableColumn="sku">
+          SKU <p-sortIcon field="sku" />
+        </th>
+        <th pSortableColumn="category">
+          Category <p-sortIcon field="category" />
+        </th>
+        <th pSortableColumn="price">
+          Price <p-sortIcon field="price" />
+        </th>
+        <th pSortableColumn="stock">
+          Stock <p-sortIcon field="stock" />
+        </th>
+        <th>Status</th>
+        <th pSortableColumn="isActive">
+          Active <p-sortIcon field="isActive" />
+        </th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+
+    <!-- Table Body -->
+    <ng-template pTemplate="body" let-product>
+      <tr>
+        <td>
+          <p-tableCheckbox [value]="product" />
+        </td>
+        <td class="font-semibold">{{ product.name }}</td>
+        <td>
+          <span class="text-color-secondary">{{ product.sku }}</span>
+        </td>
+        <td>
+          <p-tag [value]="product.category" severity="secondary" />
+        </td>
+        <td>
+          <div class="flex flex-column gap-1">
+            <span class="font-semibold">₹{{ product.price | number }}</span>
+            <span *ngIf="product.discountPrice" class="text-sm text-color-secondary">
+              <s>₹{{ product.discountPrice | number }}</s>
+              <span class="text-green-500 ml-1">
+                (-{{ product.discountPercentage }}%)
+              </span>
+            </span>
+          </div>
+        </td>
+        <td>
+          <p-tag [value]="product.stock.toString()" severity="info" />
+        </td>
+        <td>
+          <p-tag
+            [value]="getStockLabel(product)"
+            [severity]="getStockSeverity(product)"
+          />
+        </td>
+        <td>
+          <p-tag
+            [value]="product.isActive ? 'Active' : 'Inactive'"
+            [severity]="product.isActive ? 'success' : 'danger'"
+          />
+        </td>
+        <td>
+          <div class="flex gap-2">
+            <p-button
+              icon="pi pi-pencil"
+              severity="info"
+              [rounded]="true"
+              [text]="true"
+              (onClick)="editProduct(product)"
+              pTooltip="Edit"
+            />
+            <p-button
+              icon="pi pi-trash"
+              severity="danger"
+              [rounded]="true"
+              [text]="true"
+              (onClick)="deleteProduct(product)"
+              pTooltip="Delete"
+            />
+            <p-button
+              icon="pi pi-ellipsis-v"
+              severity="secondary"
+              [rounded]="true"
+              [text]="true"
+              (onClick)="menu.toggle($event)"
+              #menuButton
+            />
+            <p-menu
+              #menu
+              [model]="actionMenuItems"
+              [popup]="true"
+              appendTo="body"
+            />
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <!-- Empty State -->
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="9" class="text-center py-8">
+          <div class="flex flex-column align-items-center gap-3">
+            <i class="pi pi-shopping-cart text-6xl text-color-secondary"></i>
+            <h3 class="m-0">No products found</h3>
+            <p class="text-color-secondary">Start by adding your first product</p>
+            <p-button
+              label="Add Product"
+              icon="pi pi-plus"
+              (onClick)="openNew()"
+            />
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <!-- Product Dialog (Create/Edit) -->
+  <p-dialog
+    [(visible)]="productDialog"
+    [style]="{ width: '600px' }"
+    header="Product Details"
+    [modal]="true"
+    class="p-fluid"
+  >
+    <ng-template pTemplate="content">
+      <div class="grid">
+        <!-- Product Name -->
+        <div class="col-12">
+          <div class="field">
+            <label for="name" class="font-semibold">Name *</label>
+            <input
+              pInputText
+              id="name"
+              [(ngModel)]="product.name"
+              required
+              class="w-full"
+              [class.ng-invalid]="submitted && !product.name"
+            />
+            <small *ngIf="submitted && !product.name" class="p-error">
+              Name is required.
+            </small>
+          </div>
+        </div>
+
+        <!-- SKU -->
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="sku" class="font-semibold">SKU *</label>
+            <input
+              pInputText
+              id="sku"
+              [(ngModel)]="product.sku"
+              required
+              class="w-full"
+              [class.ng-invalid]="submitted && !product.sku"
+              [disabled]="!!product._id"
+            />
+            <small *ngIf="submitted && !product.sku" class="p-error">
+              SKU is required.
+            </small>
+          </div>
+        </div>
+
+        <!-- Category -->
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="category" class="font-semibold">Category</label>
+            <p-select
+              inputId="category"
+              [(ngModel)]="product.category"
+              [options]="categories"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select a category"
+              class="w-full"
+            />
+          </div>
+        </div>
+
+        <!-- Price -->
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="price" class="font-semibold">Price (₹) *</label>
+            <p-inputNumber
+              inputId="price"
+              [(ngModel)]="product.price"
+              mode="currency"
+              currency="INR"
+              locale="en-IN"
+              required
+              class="w-full"
+              [class.ng-invalid]="submitted && !product.price"
+            />
+            <small *ngIf="submitted && !product.price" class="p-error">
+              Price is required.
+            </small>
+          </div>
+        </div>
+
+        <!-- Discount Price -->
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="discountPrice" class="font-semibold">Discount Price (₹)</label>
+            <p-inputNumber
+              inputId="discountPrice"
+              [(ngModel)]="product.discountPrice"
+              mode="currency"
+              currency="INR"
+              locale="en-IN"
+              class="w-full"
+            />
+          </div>
+        </div>
+
+        <!-- Stock -->
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="stock" class="font-semibold">Stock Quantity</label>
+            <p-inputNumber
+              inputId="stock"
+              [(ngModel)]="product.stock"
+              class="w-full"
+            />
+          </div>
+        </div>
+
+        <!-- Low Stock Threshold -->
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="lowStockThreshold" class="font-semibold">
+              Low Stock Alert Threshold
+            </label>
+            <p-inputNumber
+              inputId="lowStockThreshold"
+              [(ngModel)]="product.lowStockThreshold"
+              class="w-full"
+            />
+          </div>
+        </div>
+
+        <!-- Weight -->
+        <div class="col-12 md:col-4">
+          <div class="field">
+            <label for="weight" class="font-semibold">Weight (kg)</label>
+            <p-inputNumber
+              inputId="weight"
+              [(ngModel)]="product.weight"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              class="w-full"
+            />
+          </div>
+        </div>
+
+        <!-- Dimensions -->
+        <div class="col-12 md:col-4">
+          <div class="field">
+            <label for="length" class="font-semibold">Length (cm)</label>
+            <p-inputNumber
+              inputId="length"
+              [(ngModel)]="product.length"
+              class="w-full"
+            />
+          </div>
+        </div>
+
+        <div class="col-12 md:col-4">
+          <div class="field">
+            <label for="width" class="font-semibold">Width (cm)</label>
+            <p-inputNumber
+              inputId="width"
+              [(ngModel)]="product.width"
+              class="w-full"
+            />
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="col-12">
+          <div class="field">
+            <label for="description" class="font-semibold">Description</label>
+            <p-editor
+              [(ngModel)]="product.description"
+              [style]="{ height: '150px' }"
+            />
+          </div>
+        </div>
+
+        <!-- Active Status -->
+        <div class="col-12">
+          <div class="field-checkbox">
+            <p-checkbox
+              inputId="isActive"
+              [(ngModel)]="product.isActive"
+            />
+            <label for="isActive" class="ml-2">Active</label>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancel"
+        icon="pi pi-times"
+        [text]="true"
+        (onClick)="hideDialog()"
+      />
+      <p-button
+        label="Save"
+        icon="pi pi-check"
+        [loading]="loading()"
+        (onClick)="saveProduct()"
+      />
+    </ng-template>
+  </p-dialog>
+</div>

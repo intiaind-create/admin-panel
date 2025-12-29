@@ -1,0 +1,312 @@
+<!-- task-form.component.html -->
+
+<p-toast />
+
+<div class="card">
+    <h2 class="text-2xl font-semibold mb-6">
+        {{ isEditMode ? 'Edit Task' : 'Create New Task' }}
+    </h2>
+
+    @if (isLoading) {
+        <div class="flex justify-center items-center py-12">
+            <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+            <span class="ml-3">Loading...</span>
+        </div>
+    } @else {
+        <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+            <div class="grid grid-cols-12 gap-4">
+                <!-- Left Column - Main Details -->
+                <div class="col-span-12 lg:col-span-8">
+                    <div class="flex flex-col gap-6">
+                        <!-- Task Title -->
+                        <div class="flex flex-col gap-2">
+                            <label for="title" class="font-medium">
+                                Task Title <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                id="title"
+                                type="text"
+                                pInputText
+                                formControlName="title"
+                                placeholder="Enter task title"
+                            />
+                            @if (
+                                taskForm.get('title')?.invalid &&
+                                taskForm.get('title')?.touched
+                            ) {
+                                <small class="text-red-500"
+                                    >Task title is required (min 3
+                                    characters)</small
+                                >
+                            }
+                        </div>
+
+                        <!-- Description -->
+                        <div class="flex flex-col gap-2">
+                            <label for="description" class="font-medium">
+                                Description <span class="text-red-500">*</span>
+                            </label>
+                            <textarea
+                                id="description"
+                                pInputTextarea
+                                formControlName="description"
+                                rows="6"
+                                placeholder="Describe the task in detail..."
+                            ></textarea>
+                            @if (
+                                taskForm.get('description')?.invalid &&
+                                taskForm.get('description')?.touched
+                            ) {
+                                <small class="text-red-500"
+                                    >Description is required</small
+                                >
+                            }
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="flex flex-col gap-2">
+                            <label for="notes" class="font-medium"
+                                >Additional Notes</label
+                            >
+                            <textarea
+                                id="notes"
+                                pInputTextarea
+                                formControlName="notes"
+                                rows="3"
+                                placeholder="Any additional instructions or notes..."
+                            ></textarea>
+                        </div>
+
+                        <!-- File Upload (TODO: Implement storage integration) -->
+                        <!-- <div class="flex flex-col gap-2">
+                            <label class="font-medium">Attachments</label>
+                            <p-fileUpload
+                                name="taskFiles[]"
+                                [multiple]="true"
+                                accept="image/*,.pdf,.doc,.docx"
+                                [maxFileSize]="5000000"
+                                [disabled]="true"
+                            >
+                                <ng-template pTemplate="content">
+                                    <div
+                                        class="h-full flex flex-col justify-center items-center py-8"
+                                    >
+                                        <i
+                                            class="pi pi-upload text-4xl mb-3 text-color-secondary"
+                                        ></i>
+                                        <span class="font-semibold"
+                                            >File upload coming soon</span
+                                        >
+                                        <small class="text-color-secondary"
+                                            >Currently unavailable</small
+                                        >
+                                    </div>
+                                </ng-template>
+                            </p-fileUpload>
+                        </div> -->
+                    </div>
+                </div>
+
+                <!-- Right Column - Task Details -->
+                <div class="col-span-12 lg:col-span-4 flex flex-col gap-y-4">
+                    <div
+                        class="border border-surface rounded p-4 flex flex-col gap-4"
+                    >
+                        <!-- Assign To Executive -->
+                     <!-- Assign To Executive -->
+<!-- Assign To Executive -->
+<!-- Assign To Executive -->
+<div class="flex flex-col gap-2">
+    <label for="assignedTo" class="font-medium">
+        Assign To <span class="text-red-500">*</span>
+    </label>
+    <p-autoComplete
+        id="assignedTo"
+        [(ngModel)]="selectedExecutiveName"
+        [ngModelOptions]="{ standalone: true }"
+        [suggestions]="filteredExecutives"
+        (completeMethod)="filterExecutives($event)"
+        (onSelect)="onExecutiveSelect($event)"
+        field="name"
+        [dropdown]="true"
+        placeholder="Search executive by name or ID..."
+        styleClass="w-full"
+    >
+        <ng-template let-exec pTemplate="item">
+            <div class="flex items-center gap-2">
+                <div>
+                    <div class="font-medium">{{ exec.name }}</div>
+                    <small class="text-color-secondary">{{ exec.wardName  }}</small>
+                </div>
+            </div>
+        </ng-template>
+    </p-autoComplete>
+    
+    @if (selectedExecutive) {
+        <small style="color: green; display: flex; align-items: center; gap: 0.25rem;">
+            <i class="pi pi-check-circle"></i> 
+            Selected: {{ selectedExecutive.name }} ({{ selectedExecutive.employeeId }})
+        </small>
+    }
+    
+    @if (
+        taskForm.get('assignedTo')?.invalid &&
+        taskForm.get('assignedTo')?.touched
+    ) {
+        <small class="text-red-500">
+            Please assign to an executive
+        </small>
+    }
+</div>
+                        <!-- Task Type -->
+                        <div class="flex flex-col gap-2">
+                            <label for="type" class="font-medium">
+                                Task Type <span class="text-red-500">*</span>
+                            </label>
+                            <p-select
+                                id="type"
+                                [options]="taskTypes"
+                                formControlName="type"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Select type"
+                                styleClass="w-full"
+                            />
+                        </div>
+
+                        <!-- Priority -->
+                        <div class="flex flex-col gap-2">
+                            <label for="priority" class="font-medium">
+                                Priority <span class="text-red-500">*</span>
+                            </label>
+                            <p-select
+                                id="priority"
+                                [options]="taskPriorities"
+                                formControlName="priority"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Select priority"
+                                styleClass="w-full"
+                            />
+                        </div>
+
+                        <!-- Due Date -->
+                        <div class="flex flex-col gap-2">
+                            <label for="dueDate" class="font-medium">
+                                Due Date <span class="text-red-500">*</span>
+                            </label>
+                            <p-datepicker
+                                id="dueDate"
+                                formControlName="dueDate"
+                                [showIcon]="true"
+                                dateFormat="yy-mm-dd"
+                                [minDate]="minDate"
+                                placeholder="Select date"
+                                styleClass="w-full"
+                            />
+                            @if (
+                                taskForm.get('dueDate')?.invalid &&
+                                taskForm.get('dueDate')?.touched
+                            ) {
+                                <small class="text-red-500"
+                                    >Due date is required</small
+                                >
+                            }
+                        </div>
+
+                        <!-- Estimated Hours -->
+                        <div class="flex flex-col gap-2">
+                            <label for="estimatedHours" class="font-medium">
+                                Estimated Hours
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <p-inputNumber
+                                id="estimatedHours"
+                                formControlName="estimatedHours"
+                                [min]="0.5"
+                                [step]="0.5"
+                                suffix=" hrs"
+                                styleClass="w-full"
+                            />
+                        </div>
+
+                        <!-- Ward ID -->
+                        <div class="flex flex-col gap-2">
+                            <label for="wardId" class="font-medium">
+                                Ward ID <span class="text-red-500">*</span>
+                            </label>
+                            <input
+                                id="wardId"
+                                type="text"
+                                pInputText
+                                formControlName="wardId"
+                                placeholder="e.g., WARD-001"
+                            />
+                            @if (
+                                taskForm.get('wardId')?.invalid &&
+                                taskForm.get('wardId')?.touched
+                            ) {
+                                <small class="text-red-500"
+                                    >Ward ID is required</small
+                                >
+                            }
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+  <label class="font-medium">Voters</label>
+  <button type="button" pButton label="Upload Voters CSV" 
+          (click)="showVotersModal = true" class="w-full"></button>
+</div>
+
+<!-- VOTERS MODAL -->
+<p-dialog header="Upload Voters" [(visible)]="showVotersModal" [modal]="true" [style]="{width: '50vw'}">
+<p-fileUpload mode="basic" accept=".csv" 
+              (onSelect)="uploadVoters($event)"
+              [auto]="true" chooseLabel="Select CSV">
+</p-fileUpload>
+  <p-table [value]="selectedVoters" *ngIf="selectedVoters.length">
+    <ng-template pTemplate="header">
+      <tr><th>Name</th><th>Age</th><th>Sex</th></tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-voter>
+      <tr>
+        <td>{{voter.name}}</td>
+        <td>{{voter.age}}</td>
+        <td>{{voter.sex}}</td>
+        <td><p-checkbox [(ngModel)]="voter.selected"></p-checkbox></td>
+      </tr>
+    </ng-template>
+  </p-table>
+  <div class="flex gap-2 mt-4">
+    <button pButton label="Assign to Task" (click)="assignVotersToTask()"></button>
+    <button pButton severity="secondary" label="Cancel" (click)="showVotersModal = false"></button>
+  </div>
+</p-dialog>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-between gap-4">
+                        <button
+                            pButton
+                            pRipple
+                            type="button"
+                            severity="secondary"
+                            outlined
+                            label="Cancel"
+                            icon="pi pi-times"
+                            (click)="onCancel()"
+                        ></button>
+                        <button
+                            pButton
+                            pRipple
+                            type="submit"
+                            [label]="isEditMode ? 'Update Task' : 'Create Task'"
+                            icon="pi pi-check"
+                            [disabled]="taskForm.invalid"
+                        ></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    }
+</div>

@@ -1,0 +1,139 @@
+<div class="manage-jobs-page">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Header -->
+  <div class="page-header">
+    <h2 class="page-title">Manage Job Postings</h2>
+
+    <div class="page-actions">
+      <button
+        pButton
+        type="button"
+        label="New Job"
+        icon="pi pi-plus"
+        class="p-button-sm"
+        (click)="openNew()"
+      ></button>
+
+      <button
+        pButton
+        type="button"
+        label="Delete Selected"
+        icon="pi pi-trash"
+        class="p-button-sm p-button-danger"
+        [disabled]="!selectedJobs || selectedJobs.length === 0"
+        (click)="deleteSelectedJobs()"
+      ></button>
+    </div>
+  </div>
+
+  <!-- Search toolbar -->
+  <div class="jobs-toolbar">
+    <div class="jobs-search-wrapper">
+      <p-iconField iconPosition="left">
+        <p-inputIcon>
+          <i class="pi pi-search"></i>
+        </p-inputIcon>
+        <input
+          pInputText
+          #globalFilter
+          type="text"
+          class="jobs-search-input"
+          placeholder="Search jobs..."
+          (input)="onGlobalFilter(dt, $event)"
+        />
+      </p-iconField>
+    </div>
+  </div>
+
+  <!-- Jobs table -->
+  <div class="jobs-card">
+    <p-table
+      #dt
+      [value]="jobs()"
+      [(selection)]="selectedJobs"
+      dataKey="_id"
+      [loading]="loading()"
+      [rows]="10"
+      [paginator]="true"
+      [rowsPerPageOptions]="[10, 25, 50]"
+      [responsiveLayout]="'scroll'"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 3rem">
+            <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
+          </th>
+          <th pSortableColumn="title">
+            Title
+            <p-sortIcon field="title"></p-sortIcon>
+          </th>
+          <th>Location</th>
+          <th>Employment Type</th>
+          <th>Status</th>
+          <th>Applications</th>
+          <th>Deadline</th>
+          <th style="width: 5rem; text-align: center;">Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-job>
+        <tr>
+          <td>
+            <p-tableCheckbox [value]="job"></p-tableCheckbox>
+          </td>
+          <td>{{ job.title }}</td>
+          <td>{{ job.location }}</td>
+          <td>{{ getEmploymentTypeLabel(job.employmentType) }}</td>
+          <td>
+            <p-tag
+              [value]="job.isActive ? 'Active' : 'Inactive'"
+              [severity]="getStatusSeverity(job.isActive)"
+            ></p-tag>
+          </td>
+          <td>{{ job.totalApplications }}</td>
+          <td>{{ job.applicationDeadline | date: 'dd/MM/yyyy' }}</td>
+          <td style="text-align: center;">
+            <!-- Inline edit/delete buttons (already working) -->
+            <button
+              pButton
+              icon="pi pi-pencil"
+              class="p-button-text p-button-rounded p-button-sm"
+              (click)="editJob(job)"
+              type="button"
+              [title]="'Edit job'"
+            ></button>
+
+            <button
+              pButton
+              icon="pi pi-trash"
+              class="p-button-text p-button-rounded p-button-sm p-button-danger"
+              (click)="deleteJob(job)"
+              type="button"
+              [title]="'Delete job'"
+            ></button>
+
+            <!-- Three-dot actions menu -->
+            <button
+              pButton
+              type="button"
+              icon="pi pi-ellipsis-v"
+              class="p-button-text p-button-rounded p-button-sm"
+              (click)="onActionsMenuClick(actionsMenu, $event, job)"
+              [title]="'More actions'"
+            ></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <!-- The overlay menu (must be inside template and have #actionsMenu) -->
+<p-menu
+  #actionsMenu
+  [popup]="true"
+  [model]="actionMenuItems"
+  [style]="{ 'z-index': 1000 }"
+></p-menu>
+  </div>
+</div>

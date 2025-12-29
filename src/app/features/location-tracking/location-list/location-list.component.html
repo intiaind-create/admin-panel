@@ -1,0 +1,322 @@
+<div class="grid">
+    <div class="col-12">
+        <p-card>
+            <ng-template pTemplate="header">
+                <div
+                    class="flex justify-content-between align-items-center px-4 py-3"
+                >
+                    <div>
+                        <h5 class="m-0">Executive Locations</h5>
+                        <p class="text-color-secondary m-0 mt-1">
+                            Real-time location tracking (Last 24 hours)
+                        </p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button
+                            pButton
+                            type="button"
+                            icon="pi pi-map"
+                            label="Live Map"
+                            routerLink="/location-tracking/live-map"
+                            class="p-button-outlined"
+                        ></button>
+                        <button
+                            pButton
+                            type="button"
+                            icon="pi pi-refresh"
+                            (click)="loadLocations()"
+                            [loading]="isLoading()"
+                            class="p-button-outlined"
+                        ></button>
+                    </div>
+                </div>
+            </ng-template>
+
+            <ng-template pTemplate="content">
+                <!-- Search -->
+                <div
+                    *ngIf="showFilters()"
+                    class="filter-panel mb-4 p-4 border-1 border-round surface-border"
+                >
+                    <div class="grid">
+                        <div class="col-12 md:col-4">
+                            <label class="block mb-2 font-semibold">Zone</label>
+<p-select
+                  inputId="zone"
+                  [options]="zoneOptions()"
+                  [ngModel]="selectedZone()"
+                  (ngModelChange)="onZoneChange($event)"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select Zone"
+                  [style]="{ width: '100%' }"
+                  [disabled]="isLoadingFilters()"
+                  [showClear]="true"
+                ></p-select>
+                        </div>
+
+                        <div class="col-12 md:col-4">
+                            <label class="block mb-2 font-semibold"
+                                >District</label
+                            >
+                           <p-select
+                  inputId="district"
+                  [options]="districtOptions()"
+                  [ngModel]="selectedDistrict()"
+                  (ngModelChange)="onDistrictChange($event)"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select District"
+                  [style]="{ width: '100%' }"
+                  [disabled]="isLoadingFilters() || !selectedZone() || districtOptions().length === 0"
+                  [showClear]="true"
+                ></p-select>
+                        </div>
+
+                        <div class="col-12 md:col-4">
+                            <label class="block mb-2 font-semibold"
+                                >Subdistrict</label
+                            >
+                            <p-select
+                  inputId="subdistrict"
+                  [options]="subdistrictOptions()"
+                  [ngModel]="selectedSubdistrict()"
+                  (ngModelChange)="selectedSubdistrict.set($event)"
+                  optionLabel="label"
+                  optionValue="value"
+                  placeholder="Select Subdistrict"
+                  [style]="{ width: '100%' }"
+                  [disabled]="isLoadingFilters() || !selectedDistrict() || subdistrictOptions().length === 0"
+                  [showClear]="true"
+                ></p-select>
+                        </div>
+
+                        <div class="col-12 flex gap-2 justify-content-end">
+                            <button
+                                pButton
+                                type="button"
+                                icon="pi pi-filter-slash"
+                                label="Clear"
+                                (click)="clearFilters()"
+                                class="p-button-outlined p-button-secondary"
+                            ></button>
+                            <button
+                                pButton
+                                type="button"
+                                icon="pi pi-check"
+                                label="Apply Filters"
+                                (click)="applyFilters()"
+                                class="p-button-primary"
+                            ></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search (only shows after data is loaded) -->
+                <div class="mb-3" *ngIf="locations().length > 0">
+                    <span class="p-input-icon-left w-full md:w-auto">
+                        <i class="pi pi-search"></i>
+                        <input
+                            pInputText
+                            type="text"
+                            placeholder="Search by name or ID..."
+                            (input)="onSearch($event)"
+                            class="w-full md:w-20rem"
+                        />
+                    </span>
+                </div>
+
+                <!-- Loading Skeleton -->
+                <div *ngIf="isLoading()" class="grid">
+                    <div
+                        *ngFor="let item of [1, 2, 3, 4, 5, 6]"
+                        class="col-12 md:col-6 lg:col-4"
+                    >
+                        <p-skeleton height="150px"></p-skeleton>
+                    </div>
+                </div>
+
+                <!-- Locations Table -->
+                <p-table
+                    *ngIf="!isLoading()"
+                    [value]="filteredLocations()"
+                    [paginator]="true"
+                    [rows]="10"
+                    [rowsPerPageOptions]="[10, 25, 50]"
+                    [globalFilterFields]="['executiveName', 'employeeId']"
+                >
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th pSortableColumn="executiveName">
+                                Name
+                                <p-sortIcon field="executiveName"></p-sortIcon>
+                            </th>
+                            <th pSortableColumn="employeeId">
+                                Employee ID
+                                <p-sortIcon field="employeeId"></p-sortIcon>
+                            </th>
+                            <th>Location</th>
+                            <th pSortableColumn="timestamp">
+                                Last Seen
+                                <p-sortIcon field="timestamp"></p-sortIcon>
+                            </th>
+                            <th>Battery</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-location>
+                        <tr>
+                            <!-- Name -->
+                            <td>
+                                <div class="flex align-items-center gap-2">
+                                    <i class="pi pi-user text-primary"></i>
+                                    <span class="font-semibold">{{
+                                        location.executiveName
+                                    }}</span>
+                                </div>
+                            </td>
+
+                            <!-- Employee ID -->
+                            <td>
+                                <span class="text-color-secondary">{{
+                                    location.employeeId
+                                }}</span>
+                            </td>
+
+                            <!-- Location Coordinates -->
+                            <td>
+                                <div class="flex align-items-center gap-2">
+                                    <i class="pi pi-map-marker text-600"></i>
+                                    <span class="font-mono text-sm">
+                                        {{
+                                            formatCoordinates(
+                                                location.latitude,
+                                                location.longitude
+                                            )
+                                        }}
+                                    </span>
+                                    <button
+                                        pButton
+                                        type="button"
+                                        icon="pi pi-external-link"
+                                        (click)="
+                                            openInMaps(
+                                                location.latitude,
+                                                location.longitude
+                                            )
+                                        "
+                                        class="p-button-text p-button-sm p-button-rounded"
+                                        pTooltip="Open in Google Maps"
+                                        tooltipPosition="top"
+                                    ></button>
+                                </div>
+                            </td>
+
+                            <!-- Last Seen -->
+                            <td>
+                                <div class="flex align-items-center gap-2">
+                                    <i class="pi pi-clock text-600"></i>
+                                    <span>{{
+                                        getTimeSince(location.timestamp)
+                                    }}</span>
+                                </div>
+                            </td>
+
+                            <!-- Battery Level -->
+                            <td>
+                                <p-tag
+                                    *ngIf="location.batteryLevel"
+                                    [severity]="
+                                        getBatteryColor(location.batteryLevel)
+                                    "
+                                    [value]="location.batteryLevel + '%'"
+                                    icon="pi pi-bolt"
+                                ></p-tag>
+                                <span
+                                    *ngIf="!location.batteryLevel"
+                                    class="text-color-secondary"
+                                >
+                                    N/A
+                                </span>
+                            </td>
+
+                            <!-- Moving Status -->
+                            <td>
+                                <p-tag
+                                    *ngIf="location.isMoving !== undefined"
+                                    [severity]="
+                                        location.isMoving ? 'info' : 'secondary'
+                                    "
+                                    [value]="
+                                        location.isMoving
+                                            ? 'Moving'
+                                            : 'Stationary'
+                                    "
+                                    [icon]="
+                                        location.isMoving
+                                            ? 'pi pi-directions'
+                                            : 'pi pi-stop-circle'
+                                    "
+                                ></p-tag>
+                                <span
+                                    *ngIf="location.isMoving === undefined"
+                                    class="text-color-secondary"
+                                >
+                                    Unknown
+                                </span>
+                            </td>
+
+                            <!-- Actions -->
+                            <td>
+                                <div class="flex gap-1">
+                                    <button
+                                        pButton
+                                        type="button"
+                                        icon="pi pi-history"
+                                        class="p-button-text p-button-sm p-button-rounded"
+                                        [routerLink]="[
+                                            '/location-tracking/executive',
+                                            location.executiveId,
+                                            'trail'
+                                        ]"
+                                        pTooltip="View Trail"
+                                        tooltipPosition="top"
+                                    ></button>
+                                    <button
+                                        pButton
+                                        type="button"
+                                        icon="pi pi-map"
+                                        class="p-button-text p-button-sm p-button-rounded p-button-success"
+                                        (click)="
+                                            openInMaps(
+                                                location.latitude,
+                                                location.longitude
+                                            )
+                                        "
+                                        pTooltip="View on Map"
+                                        tooltipPosition="top"
+                                    ></button>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="7" class="text-center py-5">
+                                <i
+                                    class="pi pi-map-marker text-4xl text-color-secondary mb-3"
+                                ></i>
+                                <p class="text-color-secondary m-0">
+                                    No location data found
+                                </p>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </ng-template>
+        </p-card>
+    </div>
+</div>

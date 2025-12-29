@@ -1,0 +1,269 @@
+:host {
+  display: block;
+}
+
+:host ::ng-deep {
+  .content-management-wrapper {
+    padding: 1.5rem;
+  }
+
+  // ✅ Green gradient header
+  .content-header {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+    margin-bottom: 2rem;
+    
+    h1, p, .text-primary, .text-2xl, .text-sm, .text-500 {
+      color: white !important;
+    }
+    
+    .surface-border {
+      border-color: rgba(255, 255, 255, 0.2) !important;
+    }
+  }
+
+  // ✅ Grid fixes
+  .grid {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -0.75rem;
+  }
+
+  .col-12 {
+    width: 100%;
+    padding: 0.75rem;
+  }
+
+  @media (min-width: 992px) {
+    .lg\:col-3:first-child {
+      flex: 0 0 30%;
+      max-width: 30%;
+    }
+    
+    .lg\:col-6 {
+      flex: 0 0 45%;
+      max-width: 45%;
+    }
+    
+    .lg\:col-3:last-child {
+      flex: 0 0 25%;
+      max-width: 25%;
+    }
+  }
+
+  // ✅ Search input
+  .p-input-icon-left {
+    position: relative;
+    
+    i {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-color-secondary);
+      z-index: 1;
+    }
+    
+    input {
+      padding-left: 3rem !important;
+    }
+  }
+
+  // ✅ Cards
+  .surface-card {
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+
+  // ✅ CLEAN SIMPLE DIALOGS
+  .p-dialog {
+    border-radius: 12px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+    
+    // Simple header
+    .p-dialog-header {
+      padding: 1.25rem 1.5rem !important;
+      border-bottom: 1px solid var(--surface-border) !important;
+      
+      .p-dialog-title {
+        font-size: 1.125rem !important;
+        font-weight: 600 !important;
+        color: var(--text-color) !important;
+      }
+      
+      .p-dialog-header-close {
+        width: 2rem !important;
+        height: 2rem !important;
+        
+        &:hover {
+          background: var(--surface-hover) !important;
+        }
+      }
+    }
+    
+    // Clean content area
+    .p-dialog-content {
+      padding: 1.5rem !important;
+      max-height: 65vh !important;
+      overflow-y: auto !important;
+    }
+    
+    // Simple footer
+    .p-dialog-footer {
+      padding: 1rem 1.5rem !important;
+      border-top: 1px solid var(--surface-border) !important;
+      display: flex !important;
+      gap: 0.75rem !important;
+      justify-content: flex-end !important;
+    }
+  }
+
+  // ✅ SIMPLE FORM FIELDS
+  .p-dialog-content {
+    // Field spacing
+    .flex-column {
+      gap: 1.25rem !important;
+    }
+    
+    // Labels
+    label {
+      display: block;
+      font-size: 0.875rem !important;
+      font-weight: 500 !important;
+      color: var(--text-color) !important;
+      margin-bottom: 0.5rem !important;
+    }
+    
+    // Text inputs
+    input[pInputText],
+    textarea {
+      width: 100% !important;
+      padding: 0.625rem 0.875rem !important;
+      font-size: 0.875rem !important;
+      border: 1px solid var(--surface-border) !important;
+      border-radius: 6px !important;
+      
+      &:focus {
+        outline: none !important;
+        border-color: var(--primary-color) !important;
+        box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.1) !important;
+      }
+      
+      &::placeholder {
+        color: var(--text-color-secondary) !important;
+      }
+    }
+    
+    textarea {
+      min-height: 80px !important;
+      resize: vertical !important;
+      line-height: 1.5 !important;
+    }
+    
+    // Grid in dialogs
+    .grid {
+      margin: 0 !important;
+      gap: 1rem !important;
+      
+      .col-12,
+      .md\:col-6 {
+        padding: 0 !important;
+      }
+      
+      .md\:col-6 {
+        width: 100%;
+        
+        @media (min-width: 768px) {
+          width: 50%;
+        }
+      }
+    }
+    
+    // Selects
+    .p-select {
+      width: 100% !important;
+      
+      .p-select-label {
+        padding: 0.625rem 0.875rem !important;
+        font-size: 0.875rem !important;
+      }
+      
+      .p-select-dropdown {
+        width: 2.5rem !important;
+      }
+    }
+    
+    // Number inputs
+    .p-inputnumber input {
+      padding: 0.625rem 0.875rem !important;
+      font-size: 0.875rem !important;
+    }
+    
+    // Checkbox
+    .p-checkbox {
+      width: 1.125rem !important;
+      height: 1.125rem !important;
+      margin-right: 0.5rem !important;
+      
+      + label {
+        font-size: 0.875rem !important;
+        margin-bottom: 0 !important;
+        cursor: pointer;
+      }
+    }
+  }
+
+  // ✅ SIMPLE BUTTONS
+  .p-dialog-footer .p-button {
+    padding: 0.5rem 1rem !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    border-radius: 6px !important;
+    
+    &.p-button-outlined {
+      background: transparent !important;
+      color: var(--text-color-secondary) !important;
+      border: 1px solid var(--surface-border) !important;
+      
+      &:hover {
+        background: var(--surface-hover) !important;
+        border-color: var(--text-color-secondary) !important;
+      }
+    }
+    
+    &:not(.p-button-outlined) {
+      background: var(--primary-color) !important;
+      border: 1px solid var(--primary-color) !important;
+      color: white !important;
+      
+      &:hover {
+        background: var(--primary-600) !important;
+        border-color: var(--primary-600) !important;
+      }
+    }
+  }
+
+  // ✅ Dropdown overlay fix
+  .p-select-overlay {
+    z-index: 1101 !important;
+  }
+
+  // ✅ Primary color
+  .text-primary {
+    color: #10b981 !important;
+  }
+
+  .p-button:not(.p-button-outlined):not([severity]) {
+    background: #10b981 !important;
+    border-color: #10b981 !important;
+    
+    &:hover {
+      background: #059669 !important;
+      border-color: #059669 !important;
+    }
+  }
+}

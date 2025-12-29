@@ -1,0 +1,298 @@
+<div class="admin-form-container">
+    <p-card>
+        <ng-template pTemplate="header">
+            <div class="card-header">
+                <h2>
+                    {{ isEditMode ? 'Edit Admin User' : 'Create Admin User' }}
+                </h2>
+            </div>
+        </ng-template>
+
+        <form [formGroup]="adminForm" (ngSubmit)="onSubmit()">
+             @if (formError()) {
+      <div class="mb-4 p-4 border-l-4 border-red-500 bg-red-50 rounded">
+        <div class="flex items-center">
+          <i class="pi pi-exclamation-triangle text-red-600 text-xl mr-3"></i>
+          <div>
+            <p class="text-red-800 font-semibold">Error</p>
+            <p class="text-red-700">{{ formError() }}</p>
+          </div>
+        </div>
+      </div>
+    }
+            <!-- Basic Information Section -->
+            <div class="form-section">
+                <h3 class="section-title">Basic Information</h3>
+
+                <div class="p-fluid p-formgrid p-grid">
+                    <div class="p-field p-col-12 p-md-6">
+                        <label for="name">Full Name *</label>
+                        <input
+                            id="name"
+                            type="text"
+                            pInputText
+                            formControlName="name"
+                            [class.ng-invalid]="isFieldInvalid('name')"
+                            placeholder="Enter full name"
+                        />
+                        <small class="p-error" *ngIf="isFieldInvalid('name')">
+                            Name is required
+                        </small>
+                    </div>
+
+                    <div class="p-field p-col-12 p-md-6">
+                        <label for="email">Email *</label>
+                        <input
+                            id="email"
+                            type="email"
+                            pInputText
+                            formControlName="email"
+                            [class.ng-invalid]="isFieldInvalid('email')"
+                            placeholder="admin@example.com"
+                        />
+                        <small class="p-error" *ngIf="isFieldInvalid('email')">
+                            Valid email is required
+                        </small>
+                    </div>
+
+                    <div class="p-field p-col-12 p-md-6">
+                        <label for="phone">Phone Number</label>
+                        <input
+                            id="phone"
+                            type="tel"
+                            pInputText
+                            formControlName="phone"
+                            placeholder="+91 1234567890"
+                        />
+                    </div>
+
+                    <div class="p-field p-col-12 p-md-6">
+                        <label for="roleLevel">Role Level (2-12) *</label>
+                        <p-select
+                            id="roleLevel"
+                            formControlName="roleLevel"
+                            [options]="roleLevelOptions"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="Select Role Level"
+                            [class.ng-invalid]="isFieldInvalid('roleLevel')"
+                            (onChange)="onRoleLevelChange($event)"
+                        ></p-select>
+
+                        <small class="p-error" *ngIf="isFieldInvalid('roleLevel')">
+                            Role level is required
+                        </small>
+                        
+                        <!-- ✅ Dynamic hint based on role requirements -->
+                        <small class="p-help" *ngIf="currentRoleLevel() && getRequiredFieldsHint()">
+                            ℹ️ {{ getRequiredFieldsHint() }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hierarchy Selection (Cascading Dropdowns) -->
+            <div class="form-section">
+                <h3 class="section-title">Hierarchy Assignment</h3>
+
+                <div class="p-fluid p-formgrid p-grid">
+                    <!-- Zone Dropdown -->
+                    <div class="p-field p-col-12 p-md-6" *ngIf="showZoneDropdown()">
+                        <label for="zone">
+                            Zone 
+                            <span class="required-indicator" *ngIf="isFieldRequired('zone')">*</span>
+                        </label>
+                        <p-select
+                            id="zone"
+                            [ngModel]="selectedZone()"
+                            [ngModelOptions]="{ standalone: true }"
+                            (onChange)="onZoneChange($event.value)"
+                            [options]="zones()"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="Select Zone"
+                            [filter]="true"
+                            [showClear]="true"
+                        ></p-select>
+                    </div>
+
+                    <!-- District Dropdown -->
+                    <div class="p-field p-col-12 p-md-6" *ngIf="showDistrictDropdown()">
+                        <label for="district">
+                            District 
+                            <span class="required-indicator" *ngIf="isFieldRequired('district')">*</span>
+                        </label>
+                        <p-select
+                            id="district"
+                            [ngModel]="selectedDistrict()"
+                            [ngModelOptions]="{ standalone: true }"
+                            (onChange)="onDistrictChange($event.value)"
+                            [options]="districts()"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="Select District"
+                            [filter]="true"
+                            [disabled]="showZoneDropdown() && !selectedZone()"
+                            [showClear]="true"
+                        ></p-select>
+                    </div>
+
+                    <!-- Subdistrict Dropdown -->
+                    <div class="p-field p-col-12 p-md-6" *ngIf="showSubdistrictDropdown()">
+                        <label for="subdistrict">
+                            Subdistrict 
+                            <span class="required-indicator" *ngIf="isFieldRequired('subdistrict')">*</span>
+                        </label>
+                        <p-select
+                            id="subdistrict"
+                            [ngModel]="selectedSubdistrict()"
+                            [ngModelOptions]="{ standalone: true }"
+                            (onChange)="onSubdistrictChange($event.value)"
+                            [options]="subdistricts()"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="Select Subdistrict"
+                            [filter]="true"
+                            [disabled]="showDistrictDropdown() && !selectedDistrict()"
+                            [showClear]="true"
+                        ></p-select>
+                    </div>
+
+                    <!-- Local Body Dropdown -->
+                    <div class="p-field p-col-12 p-md-6" *ngIf="showLocalBodyDropdown()">
+                        <label for="localBody">
+                            Local Body 
+                            <span class="required-indicator" *ngIf="isFieldRequired('localBody')">*</span>
+                        </label>
+                        <p-select
+                            id="localBody"
+                            [ngModel]="selectedLocalBody()"
+                            [ngModelOptions]="{ standalone: true }"
+                            (onChange)="onLocalBodyChange($event.value)"
+                            [options]="localBodies()"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="Select Local Body"
+                            [filter]="true"
+                            [disabled]="!selectedSubdistrict()"
+                            [showClear]="true"
+                        ></p-select>
+                    </div>
+
+                    <!-- Ward Dropdown -->
+                    <div class="p-field p-col-12 p-md-6" *ngIf="showWardDropdown()">
+                        <label for="ward">
+                            Ward 
+                            <span class="required-indicator" *ngIf="isFieldRequired('ward')">*</span>
+                        </label>
+                        <p-select
+                            id="ward"
+                            [ngModel]="selectedWard()"
+                            [ngModelOptions]="{ standalone: true }"
+                            (onChange)="onWardChange($event.value)"
+                            [options]="wards()"
+                            optionLabel="label"
+                            optionValue="value"
+                            placeholder="Select Ward"
+                            [filter]="true"
+                            [disabled]="!selectedLocalBody()"
+                            [showClear]="true"
+                        ></p-select>
+                    </div>
+                </div>
+
+                <!-- Selected Hierarchy Display -->
+                <div class="hierarchy-display" *ngIf="selectedHierarchyPath()">
+                    <p-tag
+                        severity="info"
+                        [value]="'Hierarchy: ' + selectedHierarchyPath()"
+                    ></p-tag>
+                </div>
+            </div>
+
+            <!-- Manager Assignment -->
+            <div class="form-section" *ngIf="managers().length > 0">
+                <h3 class="section-title">Manager Assignment</h3>
+
+                <div class="p-fluid p-formgrid p-grid">
+                    <div class="p-field p-col-12 p-md-6">
+                        <label for="managerId">Reporting Manager</label>
+                        <p-select
+                            id="managerId"
+                            formControlName="managerId"
+                            [options]="managers()"
+                            optionLabel="name"
+                            optionValue="_id"
+                            placeholder="Select Manager (Optional)"
+                            [filter]="true"
+                            [showClear]="true"
+                        ></p-select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="form-actions">
+                <p-button
+                    label="Cancel"
+                    icon="pi pi-times"
+                    severity="secondary"
+                    (onClick)="onCancel()"
+                    [outlined]="true"
+                ></p-button>
+
+                <p-button
+                    label="{{ isEditMode ? 'Update Admin' : 'Create Admin' }}"
+                    icon="pi pi-check"
+                    [loading]="isSubmitting"
+                    [disabled]="adminForm.invalid || isSubmitting"
+                    type="submit"
+                ></p-button>
+            </div>
+        </form>
+
+        <!-- ✅ Setup Link Section - Production Ready with Dev Toggle -->
+        <div class="setup-link-section" *ngIf="setupLink">
+            <p-message severity="success" text="Admin created successfully!"></p-message>
+
+            <!-- ✅ DEV ONLY - Remove this div in production -->
+            <div class="setup-link-card dev-only">
+                <div class="dev-badge">
+                    <i class="pi pi-code"></i> Development Only
+                </div>
+                <h4>Setup Link (DEV)</h4>
+                <p class="info-text">
+                    Share this link with the new admin to set their password:
+                </p>
+
+                <div class="link-display">
+                    <input
+                        type="text"
+                        pInputText
+                        [value]="setupLink"
+                        readonly
+                        #setupLinkInput
+                        class="setup-link-input"
+                    />
+                    <p-button
+                        icon="pi pi-copy"
+                        label="Copy"
+                        (onClick)="copySetupLink(setupLinkInput)"
+                        [outlined]="true"
+                    ></p-button>
+                </div>
+
+                <small class="warning-text">
+                    ⚠️ This link expires in 24 hours. In production, this will be sent via email.
+                </small>
+            </div>
+            <!-- ✅ END DEV ONLY -->
+
+            <div class="production-message">
+                <i class="pi pi-check-circle"></i>
+                <p>Setup email has been sent to <strong>{{ adminForm.value.email }}</strong></p>
+                <small>The new admin will receive instructions to set their password.</small>
+            </div>
+        </div>
+    </p-card>
+</div>

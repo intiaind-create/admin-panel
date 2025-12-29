@@ -1,0 +1,62 @@
+{
+    "data": [
+        {
+            "stageId": "applied",
+            "title": "Applied",
+            "candidates": [
+                {
+                    "id": "cand-01",
+                    "candidateName": "Elena Rodriguez",
+                    "jobTitle": "Senior Frontend Developer",
+                    "rating": 4,
+                    "appliedDate": "2025-10-01",
+                    "source": "LinkedIn",
+                    "interviewers": [{"name": "A", "image": "amyelsner.png"}]
+                },
+                {
+                    "id": "cand-02",
+                    "candidateName": "Ben Carter",
+                    "jobTitle": "UX/UI Designer",
+                    "rating": 5,
+                    "appliedDate": "2025-10-02",
+                    "source": "Referral"
+                }
+            ]
+        },
+        {
+            "stageId": "screening",
+            "title": "Screening",
+            "candidates": [
+                {
+                    "id": "cand-03",
+                    "candidateName": "Chen Li",
+                    "jobTitle": "Senior Frontend Developer",
+                    "rating": 5,
+                    "appliedDate": "2025-09-28",
+                    "source": "Website",
+                    "interviewers": [{"name": "I", "image": "ionibowcher.png"}]
+                }
+            ]
+        },
+        {
+            "stageId": "interview",
+            "title": "Interview",
+            "candidates": [
+                {
+                    "id": "cand-04",
+                    "candidateName": "Aisha Khan",
+                    "jobTitle": "UX/UI Designer",
+                    "rating": 4,
+                    "appliedDate": "2025-09-25",
+                    "source": "LinkedIn",
+                    "interviewers": [{"name": "A", "image": "amyelsner.png"}, {"name": "I", "image": "ionibowcher.png"}]
+                }
+            ]
+        },
+        {
+            "stageId": "offer",
+            "title": "Offer",
+            "candidates": []
+        }
+    ]
+}

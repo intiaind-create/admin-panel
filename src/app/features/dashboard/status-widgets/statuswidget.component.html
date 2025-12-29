@@ -1,0 +1,60 @@
+<!-- src/app/features/dashboard/status-widgets/statuswidget.component.html -->
+
+<!-- Loading State -->
+@if (isLoading) {
+  <div class="grid grid-cols-12 gap-8">
+    <div class="col-span-12 md:col-span-4">
+      <div class="card h-full text-center">
+        <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+      </div>
+    </div>
+    <div class="col-span-12 md:col-span-4">
+      <div class="card h-full text-center">
+        <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+      </div>
+    </div>
+    <div class="col-span-12 md:col-span-4">
+      <div class="card h-full text-center">
+        <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Error State -->
+@else if (errorMessage) {
+  <div class="card">
+    <div class="p-message p-message-error">
+      <div class="p-message-wrapper">
+        <span class="p-message-icon pi pi-times-circle"></span>
+        <div class="p-message-detail">{{ errorMessage }}</div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Data -->
+@else if (stats) {
+  <div class="grid grid-cols-12 gap-8">
+    <div class="col-span-12 md:col-span-4">
+      <div class="card h-full text-center">
+        <span class="font-semibold text-lg" i18n>Completed Tasks</span>
+        <div class="text-4xl font-bold mt-4 text-green-500">{{ tasksCompletedToday }}</div>
+      </div>
+    </div>
+
+    <div class="col-span-12 md:col-span-4">
+      <div class="card h-full text-center">
+        <span class="font-semibold text-lg" i18n>Pending Tasks</span>
+        <div class="text-4xl font-bold mt-4 text-orange-500">{{ pendingApprovals }}</div>
+      </div>
+    </div>
+
+    <div class="col-span-12 md:col-span-4">
+      <div class="card h-full text-center">
+        <span class="font-semibold text-lg" i18n>In Progress</span>
+        <div class="text-4xl font-bold mt-4 text-blue-500">{{ tasksAssignedToday }}</div>
+      </div>
+    </div>
+  </div>
+}

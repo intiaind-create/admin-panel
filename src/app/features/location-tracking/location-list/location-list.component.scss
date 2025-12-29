@@ -1,0 +1,57 @@
+:host {
+  display: block;
+  position: relative;
+  left: -14px;
+  width: calc(100% + 28px);
+  margin: 0;
+  padding: 0;
+}
+
+:host ::ng-deep {
+
+  .grid {
+    display: block !important; // Force grid to behave like a normal block
+  }
+  .col-12 {
+    padding: 0.875rem; // ✅ Add back padding inside
+  }
+
+  .p-card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  }
+
+  .p-card-body {
+    padding: 0;
+  }
+
+  .p-card-content {
+    padding: 1.25rem;
+  }
+
+  .p-card-header {
+    background: var(--surface-card);
+    border-bottom: 1px solid var(--surface-border);
+    padding: 0;
+  }
+
+  .p-datatable {
+    .p-datatable-tbody > tr > td {
+      vertical-align: middle;
+    }
+
+    .font-mono {
+      font-family: 'Courier New', monospace;
+    }
+  }
+
+  .p-tag {
+    font-size: 0.75rem;
+  }
+
+  .card {
+    padding: 1.25rem;
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: var(--border-radius);
+  }
+}
