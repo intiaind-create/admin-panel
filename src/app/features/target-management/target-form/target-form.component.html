@@ -1,0 +1,309 @@
+<!-- target-form.component.html -->
+
+<p-toast />
+
+<div class="card">
+    <h2 class="text-2xl font-semibold mb-6">
+        {{ isEditMode ? 'Edit Target' : 'Create New Target' }}
+    </h2>
+
+    @if (isLoading) {
+        <div class="flex justify-center items-center py-12">
+            <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+            <span class="ml-3">Loading...</span>
+        </div>
+    } @else {
+        <form [formGroup]="targetForm" (ngSubmit)="onSubmit()">
+            <div class="grid grid-cols-12 gap-4">
+                <!-- Left Column - Target Details -->
+                <div class="col-span-12 lg:col-span-8">
+                    <div class="flex flex-col gap-6">
+                        <!-- Assign To Executive -->
+                        <div class="flex flex-col gap-2">
+                            <label for="executiveId" class="font-medium">
+                                Assign To Executive <span class="text-red-500">*</span>
+                            </label>
+                            <p-autoComplete
+                                id="executiveId"
+                                [(ngModel)]="selectedExecutiveName"
+                                [ngModelOptions]="{ standalone: true }"
+                                [suggestions]="filteredExecutives"
+                                (completeMethod)="filterExecutives($event)"
+                                (onSelect)="onExecutiveSelect($event)"
+                                field="name"
+                                [dropdown]="true"
+                                placeholder="Search executive by name or ID..."
+                                styleClass="w-full"
+                                [disabled]="isEditMode"
+                            >
+                                <ng-template let-exec pTemplate="item">
+                                    <div class="flex items-center gap-2">
+                                        <div>
+                                            <div class="font-medium">{{ exec.name }}</div>
+                                            <small class="text-color-secondary">
+                                                {{ exec.employeeId }} • {{ exec.wardName || 'No Ward' }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </ng-template>
+                            </p-autoComplete>
+                            
+                            @if (selectedExecutive) {
+                                <small style="color: green; display: flex; align-items: center; gap: 0.25rem;">
+                                    <i class="pi pi-check-circle"></i> 
+                                    Selected: {{ selectedExecutive.name }} ({{ selectedExecutive.employeeId }})
+                                </small>
+                            }
+                            
+                            @if (
+                                targetForm.get('executiveId')?.invalid &&
+                                targetForm.get('executiveId')?.touched
+                            ) {
+                                <small class="text-red-500">
+                                    Please select an executive
+                                </small>
+                            }
+                        </div>
+
+                        <!-- Period Selection -->
+                        <div class="flex flex-col gap-2">
+                            <label for="period" class="font-medium">
+                                Target Period <span class="text-red-500">*</span>
+                            </label>
+                            <p-select
+                                id="period"
+                                [options]="targetPeriods"
+                                formControlName="period"
+                                optionLabel="label"
+                                optionValue="value"
+                                placeholder="Select period"
+                                styleClass="w-full"
+                                [disabled]="isEditMode"
+                            />
+                            <small class="text-color-secondary">
+                                Choose the timeframe for this target
+                            </small>
+                        </div>
+
+                        <!-- Date Range -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex flex-col gap-2">
+                                <label for="startDate" class="font-medium">
+                                    Start Date <span class="text-red-500">*</span>
+                                </label>
+                                <p-datepicker
+                                    id="startDate"
+                                    formControlName="startDate"
+                                    [showIcon]="true"
+                                    dateFormat="yy-mm-dd"
+                                    [minDate]="minStartDate"
+                                    placeholder="Select start date"
+                                    styleClass="w-full"
+                                    [disabled]="isEditMode"
+                                />
+                                @if (
+                                    targetForm.get('startDate')?.invalid &&
+                                    targetForm.get('startDate')?.touched
+                                ) {
+                                    <small class="text-red-500">Start date is required</small>
+                                }
+                            </div>
+
+                            <div class="flex flex-col gap-2">
+                                <label for="endDate" class="font-medium">
+                                    End Date <span class="text-red-500">*</span>
+                                </label>
+                                <p-datepicker
+                                    id="endDate"
+                                    formControlName="endDate"
+                                    [showIcon]="true"
+                                    dateFormat="yy-mm-dd"
+                                    [minDate]="minEndDate"
+                                    placeholder="Select end date"
+                                    styleClass="w-full"
+                                />
+                                @if (
+                                    targetForm.get('endDate')?.invalid &&
+                                    targetForm.get('endDate')?.touched
+                                ) {
+                                    <small class="text-red-500">End date is required</small>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Target Goals Section -->
+                        <div class="border border-surface rounded p-4">
+                            <h3 class="text-lg font-semibold mb-4 text-primary">Target Goals</h3>
+                            
+                            <div class="flex flex-col gap-4">
+                                <!-- Sponsorship Target -->
+                                <div class="flex flex-col gap-2">
+                                    <label for="sponsorshipTarget" class="font-medium">
+                                        💰 Sponsorship Target (₹) <span class="text-red-500">*</span>
+                                    </label>
+                                    <p-inputNumber
+                                        id="sponsorshipTarget"
+                                        formControlName="sponsorshipTarget"
+                                        [min]="0"
+                                        mode="currency"
+                                        currency="INR"
+                                        locale="en-IN"
+                                        placeholder="Enter amount in ₹"
+                                        styleClass="w-full"
+                                    />
+                                    <small class="text-color-secondary">
+                                        Total sponsorship amount to be collected
+                                    </small>
+                                </div>
+
+                                <!-- Tasks Target -->
+                                <div class="flex flex-col gap-2">
+                                    <label for="tasksTarget" class="font-medium">
+                                        ✅ Tasks Target <span class="text-red-500">*</span>
+                                    </label>
+                                    <p-inputNumber
+                                        id="tasksTarget"
+                                        formControlName="tasksTarget"
+                                        [min]="0"
+                                        [step]="1"
+                                        placeholder="Number of tasks"
+                                        styleClass="w-full"
+                                    />
+                                    <small class="text-color-secondary">
+                                        Number of tasks to be completed
+                                    </small>
+                                </div>
+
+                                <!-- Voters Target -->
+                                <div class="flex flex-col gap-2">
+                                    <label for="votersTarget" class="font-medium">
+                                        👥 Voters Target <span class="text-red-500">*</span>
+                                    </label>
+                                    <p-inputNumber
+                                        id="votersTarget"
+                                        formControlName="votersTarget"
+                                        [min]="0"
+                                        [step]="1"
+                                        placeholder="Number of voters"
+                                        styleClass="w-full"
+                                    />
+                                    <small class="text-color-secondary">
+                                        Number of voters to be contacted
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Summary & Actions -->
+                <div class="col-span-12 lg:col-span-4 flex flex-col gap-y-4">
+                    <!-- Summary Card -->
+                    <div class="border border-surface rounded p-4 bg-blue-50">
+                        <h3 class="text-lg font-semibold mb-3 text-primary">Target Summary</h3>
+                        
+                        <div class="flex flex-col gap-3">
+                            @if (selectedExecutive) {
+                                <div>
+                                    <label class="text-xs text-color-secondary">Executive</label>
+                                    <p class="font-semibold">{{ selectedExecutive.name }}</p>
+                                </div>
+                            }
+
+                            @if (targetForm.get('period')?.value) {
+                                <div>
+                                    <label class="text-xs text-color-secondary">Period</label>
+                                    <p class="font-semibold capitalize">
+                                        {{ targetForm.get('period')?.value }}
+                                    </p>
+                                </div>
+                            }
+
+                            @if (targetForm.get('startDate')?.value && targetForm.get('endDate')?.value) {
+                                <div>
+                                    <label class="text-xs text-color-secondary">Duration</label>
+                                    <p class="text-sm">
+                                        {{ targetForm.get('startDate')?.value | date:'MMM d, y' }} - 
+                                        {{ targetForm.get('endDate')?.value | date:'MMM d, y' }}
+                                    </p>
+                                </div>
+                            }
+
+                            <div class="border-t border-surface pt-3 mt-2">
+                                <label class="text-xs text-color-secondary">Total Goals</label>
+                                
+                                @if (targetForm.get('sponsorshipTarget')?.value) {
+                                    <div class="flex justify-between items-center mt-2">
+                                        <span class="text-sm">Sponsorship</span>
+                                        <span class="font-bold text-green-600">
+                                            {{ targetForm.get('sponsorshipTarget')?.value | currency:'INR':'symbol':'1.0-0' }}
+                                        </span>
+                                    </div>
+                                }
+
+                                @if (targetForm.get('tasksTarget')?.value) {
+                                    <div class="flex justify-between items-center mt-1">
+                                        <span class="text-sm">Tasks</span>
+                                        <span class="font-bold">
+                                            {{ targetForm.get('tasksTarget')?.value }}
+                                        </span>
+                                    </div>
+                                }
+
+                                @if (targetForm.get('votersTarget')?.value) {
+                                    <div class="flex justify-between items-center mt-1">
+                                        <span class="text-sm">Voters</span>
+                                        <span class="font-bold">
+                                            {{ targetForm.get('votersTarget')?.value }}
+                                        </span>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Info Card -->
+                    <div class="border border-yellow-200 bg-yellow-50 rounded p-4">
+                        <div class="flex gap-2">
+                            <i class="pi pi-info-circle text-yellow-600 mt-1"></i>
+                            <div class="text-sm text-yellow-800">
+                                <p class="font-semibold mb-1">Note:</p>
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li>All fields are required</li>
+                                    <li>End date must be after start date</li>
+                                    @if (isEditMode) {
+                                        <li>Executive and period cannot be changed</li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex flex-col gap-2">
+                        <button
+                            pButton
+                            pRipple
+                            type="submit"
+                            [label]="isEditMode ? 'Update Target' : 'Create Target'"
+                            icon="pi pi-check"
+                            [disabled]="targetForm.invalid"
+                            styleClass="w-full"
+                        ></button>
+                        <button
+                            pButton
+                            pRipple
+                            type="button"
+                            severity="secondary"
+                            outlined
+                            label="Cancel"
+                            icon="pi pi-times"
+                            (click)="onCancel()"
+                            styleClass="w-full"
+                        ></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    }
+</div>

@@ -1,0 +1,208 @@
+<!-- target-dashboard.component.html -->
+
+<div class="target-dashboard">
+    <!-- Filters -->
+    <div class="filters-section mb-6">
+        <div class="grid grid-cols-12 gap-4">
+            <div class="col-span-12 md:col-span-6">
+                <label class="block text-sm font-medium mb-2">Period</label>
+                <p-select
+                    [(ngModel)]="selectedPeriod"
+                    [options]="periodOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    (onChange)="onFilterChange()"
+                    styleClass="w-full"
+                />
+            </div>
+            <div class="col-span-12 md:col-span-6">
+                <label class="block text-sm font-medium mb-2">Time Range</label>
+                <p-select
+                    [(ngModel)]="selectedDaysBack"
+                    [options]="daysBackOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    (onChange)="onFilterChange()"
+                    styleClass="w-full"
+                />
+            </div>
+        </div>
+    </div>
+
+    @if (isLoading) {
+        <div class="flex justify-center items-center py-12">
+            <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+            <span class="ml-3">Loading statistics...</span>
+        </div>
+    } @else if (stats) {
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-12 gap-4 mb-6">
+            <!-- Total Targets -->
+            <div class="col-span-12 md:col-span-3">
+                <p-card styleClass="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-icon bg-blue-100 text-blue-600">
+                            <i class="pi pi-chart-line"></i>
+                        </div>
+                        <div class="stat-details">
+                            <div class="stat-value">{{ stats.total }}</div>
+                            <div class="stat-label">Total Targets</div>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+
+            <!-- Active Targets -->
+            <div class="col-span-12 md:col-span-3">
+                <p-card styleClass="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-icon bg-green-100 text-green-600">
+                            <i class="pi pi-check-circle"></i>
+                        </div>
+                        <div class="stat-details">
+                            <div class="stat-value">{{ stats.active }}</div>
+                            <div class="stat-label">Active</div>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+
+            <!-- Completed Targets -->
+            <div class="col-span-12 md:col-span-3">
+                <p-card styleClass="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-icon bg-purple-100 text-purple-600">
+                            <i class="pi pi-trophy"></i>
+                        </div>
+                        <div class="stat-details">
+                            <div class="stat-value">{{ stats.completed }}</div>
+                            <div class="stat-label">Completed</div>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+
+            <!-- On Track -->
+            <div class="col-span-12 md:col-span-3">
+                <p-card styleClass="stat-card">
+                    <div class="stat-content">
+                        <div class="stat-icon bg-yellow-100 text-yellow-600">
+                            <i class="pi pi-bolt"></i>
+                        </div>
+                        <div class="stat-details">
+                            <div class="stat-value">{{ stats.onTrack }}</div>
+                            <div class="stat-label">On Track</div>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+        </div>
+
+        <!-- Achievement Progress -->
+        <div class="grid grid-cols-12 gap-4">
+            <!-- Sponsorship Achievement -->
+            <div class="col-span-12 lg:col-span-4">
+                <p-card>
+                    <div class="achievement-card">
+                        <div class="achievement-header">
+                            <i class="pi pi-money-bill achievement-icon text-green-600"></i>
+                            <h3 class="achievement-title">Sponsorship</h3>
+                        </div>
+                        <div class="achievement-stats">
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">
+                                    {{ formatCurrency(stats.totalSponsorshipAchieved) }}
+                                </span>
+                                <span class="text-color-secondary">
+                                    / {{ formatCurrency(stats.totalSponsorshipTarget) }}
+                                </span>
+                            </div>
+                            <p-progressBar
+                                [value]="stats.sponsorshipAchievementRate"
+                                [showValue]="false"
+                                [style]="{ height: '12px' }"
+                            />
+                            <div class="text-center mt-2">
+                                <span class="text-2xl font-bold text-green-600">
+                                    {{ stats.sponsorshipAchievementRate }}%
+                                </span>
+                                <div class="text-sm text-color-secondary">Achievement Rate</div>
+                            </div>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+
+            <!-- Tasks Achievement -->
+            <div class="col-span-12 lg:col-span-4">
+                <p-card>
+                    <div class="achievement-card">
+                        <div class="achievement-header">
+                            <i class="pi pi-check-square achievement-icon text-blue-600"></i>
+                            <h3 class="achievement-title">Tasks</h3>
+                        </div>
+                        <div class="achievement-stats">
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">
+                                    {{ stats.totalTasksCompleted }}
+                                </span>
+                                <span class="text-color-secondary">
+                                    / {{ stats.totalTasksTarget }}
+                                </span>
+                            </div>
+                            <p-progressBar
+                                [value]="stats.tasksAchievementRate"
+                                [showValue]="false"
+                                [style]="{ height: '12px' }"
+                            />
+                            <div class="text-center mt-2">
+                                <span class="text-2xl font-bold text-blue-600">
+                                    {{ stats.tasksAchievementRate }}%
+                                </span>
+                                <div class="text-sm text-color-secondary">Achievement Rate</div>
+                            </div>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+
+            <!-- Voters Achievement -->
+            <div class="col-span-12 lg:col-span-4">
+                <p-card>
+                    <div class="achievement-card">
+                        <div class="achievement-header">
+                            <i class="pi pi-users achievement-icon text-purple-600"></i>
+                            <h3 class="achievement-title">Voters</h3>
+                        </div>
+                        <div class="achievement-stats">
+                            <div class="flex justify-between mb-2">
+                                <span class="font-semibold">
+                                    {{ stats.totalVotersContacted }}
+                                </span>
+                                <span class="text-color-secondary">
+                                    / {{ stats.totalVotersTarget }}
+                                </span>
+                            </div>
+                            <p-progressBar
+                                [value]="stats.votersAchievementRate"
+                                [showValue]="false"
+                                [style]="{ height: '12px' }"
+                            />
+                            <div class="text-center mt-2">
+                                <span class="text-2xl font-bold text-purple-600">
+                                    {{ stats.votersAchievementRate }}%
+                                </span>
+                                <div class="text-sm text-color-secondary">Achievement Rate</div>
+                            </div>
+                        </div>
+                    </div>
+                </p-card>
+            </div>
+        </div>
+
+        <!-- Time Window Info -->
+        <div class="mt-4 text-center text-sm text-color-secondary">
+            Showing data for: {{ stats.timeWindow }}
+        </div>
+    }
+</div>

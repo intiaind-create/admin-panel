@@ -1,0 +1,268 @@
+<!-- target-list.component.html -->
+
+<p-toast />
+<p-confirmDialog />
+
+<div class="card">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-semibold">Target Management</h2>
+        <button
+            pButton
+            pRipple
+            label="Create Target"
+            icon="pi pi-plus"
+            (click)="createTarget()"
+        ></button>
+    </div>
+
+    <!-- Filters -->
+    <div class="grid grid-cols-12 gap-4 mb-6">
+        <!-- Executive Filter -->
+        <div class="col-span-12 md:col-span-4">
+            <label class="block text-sm font-medium mb-2">Executive</label>
+            <div class="flex gap-2">
+                <p-autoComplete
+                    [(ngModel)]="selectedExecutiveName"
+                    [suggestions]="filteredExecutives"
+                    (completeMethod)="filterExecutives($event)"
+                    (onSelect)="onExecutiveSelect($event)"
+                    field="name"
+                    [dropdown]="true"
+                    placeholder="All Executives"
+                    styleClass="w-full"
+                >
+                    <ng-template let-exec pTemplate="item">
+                        <div>
+                            <div class="font-medium">{{ exec.name }}</div>
+                            <small class="text-color-secondary">{{ exec.employeeId }}</small>
+                        </div>
+                    </ng-template>
+                </p-autoComplete>
+                @if (selectedExecutive) {
+                    <button
+                        pButton
+                        icon="pi pi-times"
+                        severity="secondary"
+                        (click)="clearExecutiveFilter()"
+                    ></button>
+                }
+            </div>
+        </div>
+
+        <!-- Period Filter -->
+        <div class="col-span-12 md:col-span-4">
+            <label class="block text-sm font-medium mb-2">Period</label>
+            <p-select
+                [(ngModel)]="selectedPeriod"
+                [options]="periodOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="All Periods"
+                (onChange)="applyFilters()"
+                styleClass="w-full"
+            />
+        </div>
+
+        <!-- Status Filter -->
+        <div class="col-span-12 md:col-span-4">
+            <label class="block text-sm font-medium mb-2">Status</label>
+            <p-select
+                [(ngModel)]="selectedStatus"
+                [options]="statusOptions"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="All Status"
+                (onChange)="applyFilters()"
+                styleClass="w-full"
+            />
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    @if (isLoading && targets.length === 0) {
+        <div class="flex justify-center items-center py-12">
+            <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+            <span class="ml-3">Loading targets...</span>
+        </div>
+    }
+
+    <!-- Empty State -->
+    @if (!isLoading && targets.length === 0) {
+        <div class="text-center py-12">
+            <i class="pi pi-inbox" style="font-size: 3rem; color: #9ca3af"></i>
+            <h3 class="text-xl font-semibold mt-4">No Targets Found</h3>
+            <p class="text-color-secondary mt-2">Create your first target to get started</p>
+            <button
+                pButton
+                label="Create Target"
+                icon="pi pi-plus"
+                (click)="createTarget()"
+                class="mt-4"
+            ></button>
+        </div>
+    }
+
+    <!-- Targets Table -->
+    @if (targets.length > 0) {
+        <p-table
+            [value]="targets"
+            [tableStyle]="{ 'min-width': '60rem' }"
+            styleClass="p-datatable-striped"
+        >
+            <ng-template pTemplate="header">
+                <tr>
+                    <th>Executive</th>
+                    <th>Period</th>
+                    <th>Duration</th>
+                    <th>Sponsorship</th>
+                    <th>Tasks</th>
+                    <th>Voters</th>
+                    <th>Overall Progress</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-target>
+                <tr>
+                    <!-- Executive Info -->
+                    <td>
+                        <div>
+                            <div class="font-semibold">{{ target.executiveName }}</div>
+                            <small class="text-color-secondary">{{ target.executiveEmployeeId }}</small>
+                        </div>
+                    </td>
+
+                    <!-- Period -->
+                    <td>
+                        <span class="capitalize font-medium">{{ target.period }}</span>
+                    </td>
+
+                    <!-- Duration -->
+                    <td>
+                        <div class="text-sm">
+                            {{ formatDateRange(target.startDate, target.endDate) }}
+                            <div class="text-color-secondary mt-1">
+                                {{ target.daysRemaining }} days left
+                            </div>
+                        </div>
+                    </td>
+
+                    <!-- Sponsorship Progress -->
+                    <td>
+                        <div class="flex flex-col gap-1">
+                            <div class="text-sm font-semibold">
+                                {{ formatCurrency(target.sponsorshipAchieved) }} / 
+                                {{ formatCurrency(target.sponsorshipTarget) }}
+                            </div>
+                            <p-progressBar
+                                [value]="target.sponsorshipProgress"
+                                [showValue]="false"
+                                [style]="{ height: '6px', backgroundColor: '#e5e7eb' }"
+                            />
+                            <small class="text-color-secondary">
+                                {{ target.sponsorshipProgress }}%
+                            </small>
+                        </div>
+                    </td>
+
+                    <!-- Tasks Progress -->
+                    <td>
+                        <div class="flex flex-col gap-1">
+                            <div class="text-sm font-semibold">
+                                {{ target.tasksCompleted }} / {{ target.tasksTarget }}
+                            </div>
+                            <p-progressBar
+                                [value]="target.tasksProgress"
+                                [showValue]="false"
+                                [style]="{ height: '6px', backgroundColor: '#e5e7eb' }"
+                            />
+                            <small class="text-color-secondary">
+                                {{ target.tasksProgress }}%
+                            </small>
+                        </div>
+                    </td>
+
+                    <!-- Voters Progress -->
+                    <td>
+                        <div class="flex flex-col gap-1">
+                            <div class="text-sm font-semibold">
+                                {{ target.votersContacted }} / {{ target.votersTarget }}
+                            </div>
+                            <p-progressBar
+                                [value]="target.votersProgress"
+                                [showValue]="false"
+                                [style]="{ height: '6px', backgroundColor: '#e5e7eb' }"
+                            />
+                            <small class="text-color-secondary">
+                                {{ target.votersProgress }}%
+                            </small>
+                        </div>
+                    </td>
+
+                    <!-- Overall Progress -->
+                    <td>
+                        <div class="flex flex-col items-center gap-1">
+                            <div
+                                class="text-2xl font-bold"
+                                [style.color]="getProgressColor(target.overallProgress)"
+                            >
+                                {{ target.overallProgress }}%
+                            </div>
+                            <p-tag
+                                [value]="target.isOnTrack ? 'On Track' : 'Behind'"
+                                [severity]="target.isOnTrack ? 'success' : 'danger'"
+                            />
+                        </div>
+                    </td>
+
+                    <!-- Status -->
+                    <td>
+                        <p-tag
+                            [value]="target.status | titlecase"
+                            [severity]="getStatusSeverity(target.status)"
+                        />
+                    </td>
+
+                    <!-- Actions -->
+                    <td>
+                        <div class="flex gap-2">
+                            <button
+                                pButton
+                                icon="pi pi-pencil"
+                                severity="info"
+                                [text]="true"
+                                (click)="editTarget(target)"
+                                pTooltip="Edit"
+                            ></button>
+                            <button
+                                pButton
+                                icon="pi pi-trash"
+                                severity="danger"
+                                [text]="true"
+                                (click)="deleteTarget(target)"
+                                pTooltip="Delete"
+                                [disabled]="target.status === 'completed'"
+                            ></button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+
+        <!-- Load More Button -->
+        @if (hasMore) {
+            <div class="flex justify-center mt-6">
+                <button
+                    pButton
+                    label="Load More"
+                    icon="pi pi-angle-down"
+                    severity="secondary"
+                    outlined
+                    [loading]="isLoading"
+                    (click)="loadMore()"
+                ></button>
+            </div>
+        }
+    }
+</div>

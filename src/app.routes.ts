@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { AuthGuard } from '@/core/guards/auth.guard';
 import { LayoutComponent } from '@/layout/components/layout/layout.component';
 import { NotFoundComponent } from '@/shared/notfound/notfound.component';
+
 export const appRoutes: Routes = [
     // 1. Auth routes are separate and unprotected
     {
@@ -10,11 +11,12 @@ export const appRoutes: Routes = [
             import('@/core/auth/auth.routes').then((m) => m.AUTH_ROUTES)
     },
     {
-    path: 'apply',
-    loadComponent: () =>
-      import('@/features/hr-recruitment/public/component/public-application-form.component')
-        .then(m => m.PublicApplicationFormComponent),
-  },
+        path: 'apply',
+        loadComponent: () =>
+            import(
+                '@/features/hr-recruitment/public/component/public-application-form.component'
+            ).then((m) => m.PublicApplicationFormComponent)
+    },
 
     // 2. The main application layout, protected by the AuthGuard
     {
@@ -26,9 +28,9 @@ export const appRoutes: Routes = [
             {
                 path: 'dashboard',
                 loadComponent: () =>
-                    import('@/features/dashboard/component/dashboard-component').then(
-                        (c) => c.DashboardComponent
-                    )
+                    import(
+                        '@/features/dashboard/component/dashboard-component'
+                    ).then((c) => c.DashboardComponent)
             },
 
             {
@@ -39,17 +41,25 @@ export const appRoutes: Routes = [
                     ).then((m) => m.USER_MANAGEMENT_ROUTES)
             },
             {
-                path:'tasks',
-                loadChildren: ()=>
-                    import('@/features/task-management/task-management.route').
-                    then((m)=>m.TASK_MANAGEMENT_ROUTE)
-                
+                path: 'tasks',
+                loadChildren: () =>
+                    import(
+                        '@/features/task-management/task-management.route'
+                    ).then((m) => m.TASK_MANAGEMENT_ROUTE)
             },
-             {
+            {
+                path: 'targets',
+                loadChildren: () =>
+                    import(
+                        '@/features/target-management/target-management.route'
+                    ).then((m) => m.TARGET_MANAGEMENT_ROUTE)
+            },
+            {
                 path: 'location-tracking',
                 loadChildren: () =>
-                    import('@/features/location-tracking/location-tracking.routes')
-                        .then((m) => m.LOCATION_TRACKING_ROUTES)
+                    import(
+                        '@/features/location-tracking/location-tracking.routes'
+                    ).then((m) => m.LOCATION_TRACKING_ROUTES)
             },
             {
                 path: 'recruitment',
@@ -86,8 +96,6 @@ export const appRoutes: Routes = [
     },
 
     // 3. Not Found and wildcard routes
-   { path: 'notfound', component: NotFoundComponent },
+    { path: 'notfound', component: NotFoundComponent },
     { path: '**', component: NotFoundComponent }
-
-    
 ];

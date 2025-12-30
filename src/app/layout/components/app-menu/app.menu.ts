@@ -71,36 +71,68 @@ export class AppMenuComponent {
                     label: 'Add Tasks',
                     icon: 'pi pi-sitemap',
                     routerLink: ['/tasks/tasks-add'],
-                    i18n: '@@menuTaskList'
+                    i18n: '@@menuAddTask'
+                }
+            ]
+        };
+
+        // ✅ Target Management - Available to ALL admin roles (NEW)
+        const targetSettings = {
+            label: 'Target Management',
+            i18n: '@@menuTargetManagement',
+            items: [
+                {
+                    label: 'Targets List',
+                    icon: 'pi pi-chart-line',
+                    routerLink: ['/targets/targets-list'],
+                    i18n: '@@menuTargetsList'
+                },
+                {
+                    label: 'Add Target',
+                    icon: 'pi pi-plus-circle',
+                    routerLink: ['/targets/targets-add'],
+                    i18n: '@@menuAddTarget'
+                },
+                {
+                    label: 'Dashboard',
+                    icon: 'pi pi-chart-bar',
+                    routerLink: ['/targets/targets-dashboard'],
+                    i18n: '@@menuTargetsDashboard'
                 }
             ]
         };
 
         const locationTrackingMenu =
-    roleLevel >= 3
-        ? [
-              {
-                  label: 'Location Tracking',
-                  i18n: '@@menuLocationTracking',
-                  items: [
+            roleLevel >= 3
+                ? [
                       {
-                          label: 'Live Map',
-                          icon: 'pi pi-map',
-                          routerLink: ['/location-tracking/live-map'],
-                          i18n: '@@menuLiveMap'
-                      },
-                      {
-                          label: 'Location History',
-                          icon: 'pi pi-history',
-                          routerLink: ['/location-tracking/list'],
-                          i18n: '@@menuLocationHistory'
+                          label: 'Location Tracking',
+                          i18n: '@@menuLocationTracking',
+                          items: [
+                              {
+                                  label: 'Live Map',
+                                  icon: 'pi pi-map',
+                                  routerLink: ['/location-tracking/live-map'],
+                                  i18n: '@@menuLiveMap'
+                              },
+                              {
+                                  label: 'Location History',
+                                  icon: 'pi pi-history',
+                                  routerLink: ['/location-tracking/list'],
+                                  i18n: '@@menuLocationHistory'
+                              }
+                          ]
                       }
                   ]
-              }
-          ]
-        : [];
+                : [];
+
         // ✅ Base menu for ALL roles
-        const baseMenu = [dashboardMenu, executiveManagement, taskSettings];
+        const baseMenu = [
+            dashboardMenu,
+            executiveManagement,
+            taskSettings,
+            targetSettings // ✅ ADDED TARGET MANAGEMENT
+        ];
 
         // 🎯 LOCAL BODY MANAGER+ (Level 4+): Can view admins
         const adminManagementMenu =
@@ -212,10 +244,10 @@ export class AppMenuComponent {
 
         // ✅ Build final menu based on role level
         return [
-            ...baseMenu, // ALL roles (Level 2+)
+            ...baseMenu, // ALL roles (Level 2+) - NOW INCLUDES TARGET MANAGEMENT
             ...adminManagementMenu, // Level 4+ (Local Body Manager+)
-             ...locationTrackingMenu, 
-            ...trainingMenu, // Level 6+ (District Manager+) ✅ NEW
+            ...locationTrackingMenu,
+            ...trainingMenu, // Level 6+ (District Manager+)
             ...hrMenu, // Level 10+ (State Head+)
             ...storeMenu // Level 12 only (Super Admin)
         ];

@@ -1,0 +1,89 @@
+// target-list.component.scss
+
+.card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+// Table styling
+::ng-deep {
+  .p-datatable {
+    .p-datatable-thead > tr > th {
+      background-color: #f9fafb;
+      font-weight: 600;
+      color: #374151;
+      padding: 1rem;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .p-datatable-tbody > tr {
+      > td {
+        padding: 1rem;
+        vertical-align: middle;
+      }
+
+      &:hover {
+        background-color: #f9fafb;
+      }
+    }
+  }
+
+  // Progress bar styling
+  .p-progressbar {
+    border-radius: 4px;
+
+    .p-progressbar-value {
+      border-radius: 4px;
+      background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+    }
+  }
+
+  // Tag styling
+  .p-tag {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+}
+
+// Filter section
+.grid {
+  label {
+    color: #374151;
+    font-weight: 500;
+  }
+}
+
+// Empty state
+.text-center {
+  .pi-inbox {
+    opacity: 0.3;
+  }
+}
+
+// Loading state
+.pi-spinner {
+  color: #3b82f6;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .card {
+    padding: 1rem;
+  }
+
+  ::ng-deep {
+    .p-datatable {
+      font-size: 0.875rem;
+
+      .p-datatable-thead > tr > th,
+      .p-datatable-tbody > tr > td {
+        padding: 0.5rem;
+      }
+    }
+  }
+}

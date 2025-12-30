@@ -1,0 +1,100 @@
+// target-form.component.scss
+
+.card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+// Executive autocomplete styling
+::ng-deep {
+  p-autoComplete {
+    .p-autocomplete-input {
+      width: 100%;
+    }
+  }
+
+  .p-autocomplete-panel {
+    .p-autocomplete-item {
+      padding: 0.75rem 1rem;
+      
+      &:hover {
+        background-color: #f3f4f6;
+      }
+    }
+  }
+}
+
+// Summary card styling
+.bg-blue-50 {
+  background-color: #eff6ff;
+  border-color: #dbeafe;
+}
+
+.text-primary {
+  color: #2563eb;
+}
+
+// Info card styling
+.bg-yellow-50 {
+  background-color: #fffbeb;
+}
+
+.text-yellow-600 {
+  color: #d97706;
+}
+
+.text-yellow-800 {
+  color: #92400e;
+}
+
+// Currency input styling
+::ng-deep {
+  .p-inputnumber-input {
+    text-align: right;
+    font-weight: 600;
+  }
+}
+
+// Button styling
+::ng-deep {
+  .p-button {
+    &.w-full {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+// Form validation
+.text-red-500 {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+// Date picker styling
+::ng-deep {
+  .p-datepicker {
+    .p-datepicker-trigger {
+      color: #6b7280;
+    }
+  }
+}
+
+// Target goals section
+.border-surface {
+  border-color: #e5e7eb;
+}
+
+// Responsive adjustments
+@media (max-width: 1024px) {
+  .card {
+    padding: 1rem;
+  }
+
+  .grid {
+    gap: 1rem;
+  }
+}   
